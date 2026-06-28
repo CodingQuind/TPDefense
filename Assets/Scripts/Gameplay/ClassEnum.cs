@@ -1,0 +1,9 @@
+using UnityEngine;
+
+public enum ClassEnum
+{
+    Warrior = 0,
+    Assassin = 1,
+    Mage = 2,
+    Builder = 3
+}
