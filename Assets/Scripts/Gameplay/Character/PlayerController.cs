@@ -3,37 +3,40 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    // --- Public Variables ---
     [Header("Movement")]
-    public float moveSpeed;
+    public float baseMoveSpeed = CharacterSettings.characterSpeed; 
+    public float baseSprintSpeed = CharacterSettings.characterSprintSpeed;
     public float jumpHeight = 1.2f;
     public float gravity = -9.81f;
 
     [Header("Mouse Look")]
-    public float mouseSensitivity = 300f;
-    public Transform cameraTransform;
+    public float mouseSensitivity = 5f;
+    public Camera playerCamera;
 
+    // --- Private Variables ---
+    // Movement and Look
     private CharacterController controller;
-    private float verticalVelocity;
-    private float xRotation;
-
+    private float verticalVelocity, xRotation;
     private bool isGroundedBuffered;
-    private float groundedTimer;
-    private float groundedBufferTime = 0.15f;
-    private float moveAcceleration = 5f;
+    private float groundedTimer, groundedBufferTime = 0.15f;
+    private float moveAcceleration = 5f, moveSpeed;
     private Vector3 smoothedMove;
 
-    private InputAction sprintAction;
-    private InputAction moveAction;
-    private InputAction jumpAction;
+    // Input Actions
+    private InputAction sprintAction, moveAction, jumpAction;
+    private InputAction lookAction;
+    private InputAction interactAction;
 
     private void ConfigureSettings()
     {
-        moveSpeed = CharacterSettings.characterSpeed;
 
         // Input Action References
         sprintAction = InputSystem.actions.FindAction("sprint");
         moveAction = InputSystem.actions.FindAction("move");
         jumpAction = InputSystem.actions.FindAction("jump");
+        interactAction = InputSystem.actions.FindAction("interact");
+        lookAction = InputSystem.actions.FindAction("look");
     }
     void Start()
     {
@@ -46,17 +49,37 @@ public class PlayerController : MonoBehaviour
     {
         HandleLook();
         HandleMovement();
+
+        if (interactAction.WasPressedThisFrame())
+        {
+            Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                GameObject objectHit = hit.transform.gameObject;
+                if (objectHit.TryGetComponent<IInteractInterface>(out var interactable))
+                {
+                    interactable.Interact(this.gameObject);
+                }
+            }
+
+        }
     }
 
     void HandleLook()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        Vector2 lookInput = lookAction.ReadValue<Vector2>();
 
+        // Scale input
+        float mouseX = lookInput.x * mouseSensitivity * .01f;
+        float mouseY = lookInput.y * mouseSensitivity * .01f;
+
+        // Vertical rotation (camera pitch)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -70f, 85f);
 
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        // Horizontal rotation (player yaw)
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -88,8 +111,8 @@ public class PlayerController : MonoBehaviour
 
         // --- Sprint ---
         float targetSpeed = sprintAction.IsPressed() 
-                            ? CharacterSettings.characterSprintSpeed 
-                            : CharacterSettings.characterSpeed;
+                            ? baseSprintSpeed 
+                            : baseMoveSpeed;
 
         moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, Time.deltaTime * moveAcceleration);
 
@@ -99,5 +122,10 @@ public class PlayerController : MonoBehaviour
         // --- Apply movement once ---
         Vector3 velocity = smoothedMove * moveSpeed + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void Interact(GameObject interactObject)
+    {
+        Debug.Log("Hit " + interactObject.name);
     }
 }
