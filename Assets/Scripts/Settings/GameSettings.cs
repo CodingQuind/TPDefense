@@ -10,7 +10,7 @@ public static class GameSettings
 public static class CharacterSettings
 {
     public static string characterName;
-    public static float characterSpeed = 6f;
+    public static float characterSpeed = 5f, characterSprintSpeed = 8f;
     public static ClassEnum characterClass;
 }
 [System.Serializable]

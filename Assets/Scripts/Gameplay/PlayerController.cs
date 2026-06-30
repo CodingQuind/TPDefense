@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,10 +19,21 @@ public class PlayerController : MonoBehaviour
     private bool isGroundedBuffered;
     private float groundedTimer;
     private float groundedBufferTime = 0.15f;
+    private float moveAcceleration = 5f;
+    private Vector3 smoothedMove;
+
+    private InputAction sprintAction;
+    private InputAction moveAction;
+    private InputAction jumpAction;
 
     private void ConfigureSettings()
     {
         moveSpeed = CharacterSettings.characterSpeed;
+
+        // Input Action References
+        sprintAction = InputSystem.actions.FindAction("sprint");
+        moveAction = InputSystem.actions.FindAction("move");
+        jumpAction = InputSystem.actions.FindAction("jump");
     }
     void Start()
     {
@@ -50,7 +62,7 @@ public class PlayerController : MonoBehaviour
 
     void HandleMovement()
     {
-        // --- Ground buffer logic ---
+        // --- Ground buffer logic (fixes jump not working sometimes) ---
         if (controller.isGrounded)
         {
             groundedTimer = groundedBufferTime;
@@ -61,26 +73,31 @@ public class PlayerController : MonoBehaviour
         }
         isGroundedBuffered = groundedTimer > 0f;
 
-        // --- Horizontal movement ---
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        Vector3 move = transform.right * x + transform.forward * z;
-
+        Vector2 moveInput = moveAction.ReadValue<Vector2>();
+        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
+        smoothedMove = Vector3.Lerp(smoothedMove, move, Time.deltaTime * moveAcceleration);
+        
         // --- Jump ---
         if (isGroundedBuffered)
         {
-            if (verticalVelocity < 0)
-                verticalVelocity = -2f;
+            if (verticalVelocity < 0) verticalVelocity = -2f;
 
-            if (Input.GetButtonDown("Jump") || Input.GetButton("Jump"))
+            if (jumpAction.WasPressedThisFrame())
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
+
+        // --- Sprint ---
+        float targetSpeed = sprintAction.IsPressed() 
+                            ? CharacterSettings.characterSprintSpeed 
+                            : CharacterSettings.characterSpeed;
+
+        moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, Time.deltaTime * moveAcceleration);
 
         // --- Gravity ---
         verticalVelocity += gravity * Time.deltaTime;
 
         // --- Apply movement once ---
-        Vector3 velocity = move * moveSpeed + Vector3.up * verticalVelocity;
+        Vector3 velocity = smoothedMove * moveSpeed + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
     }
 }
