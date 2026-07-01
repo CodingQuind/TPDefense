@@ -371,6 +371,7 @@ GameObject:
   - component: {fileID: 514453440}
   - component: {fileID: 514453439}
   - component: {fileID: 514453441}
+  - component: {fileID: 514453443}
   - component: {fileID: 514453442}
   m_Layer: 0
   m_Name: CharacterRoot
@@ -426,6 +427,7 @@ MonoBehaviour:
   gravity: -9.81
   mouseSensitivity: 5
   playerCamera: {fileID: 1020517828}
+  playerClass: 0
 --- !u!143 &514453442
 CharacterController:
   m_ObjectHideFlags: 0
@@ -451,6 +453,18 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &514453443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 514453438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 447e1b24fc0c69d4a8b905101071d481, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatSystem
 --- !u!1 &541208161
 GameObject:
   m_ObjectHideFlags: 0

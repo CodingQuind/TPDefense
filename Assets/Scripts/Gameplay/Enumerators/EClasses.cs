@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum ClassEnum
+public enum EClasses
 {
     Warrior = 0,
     Assassin = 1,

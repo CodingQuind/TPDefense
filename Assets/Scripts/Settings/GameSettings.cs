@@ -11,7 +11,7 @@ public static class CharacterSettings
 {
     public static string characterName;
     public static float characterSpeed = 5f, characterSprintSpeed = 8f;
-    public static ClassEnum characterClass;
+    public static EClasses characterClass;
 }
 [System.Serializable]
 public static class StatSystemSettings

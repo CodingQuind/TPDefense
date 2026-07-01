@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageableInterface
 {
     // --- Public Variables ---
     [Header("Movement")]
@@ -13,6 +13,9 @@ public class PlayerController : MonoBehaviour
     [Header("Mouse Look")]
     public float mouseSensitivity = 5f;
     public Camera playerCamera;
+
+    [Header("Combat")]
+    [SerializeField] private EClasses playerClass;
 
     // --- Private Variables ---
     // Movement and Look
@@ -128,4 +131,16 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log("Hit " + interactObject.name);
     }
+
+    public void TakeDamage(GameObject attacker, float damage, EDamageType damageType)
+    {
+        //Apply damage to stat system
+    }
+    public void DamageTarget(GameObject target, float damage, EDamageType damageType)
+    {
+        if (target.TryGetComponent<IDamageableInterface>(out var component)) {
+        component.TakeDamage(this.gameObject, damage, damageType);
+        }
+    }
+
 }
