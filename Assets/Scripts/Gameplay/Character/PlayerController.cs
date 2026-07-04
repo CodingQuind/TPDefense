@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     [Header("Combat")]
     [SerializeField] private EClasses playerClass;
+    [SerializeField] private CombatSystem combat;
 
     // --- Private Variables ---
     // Movement and Look
@@ -29,7 +30,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     // Input Actions
     private InputAction sprintAction, moveAction, jumpAction;
     private InputAction lookAction;
-    private InputAction interactAction;
+    private InputAction interactAction, attackAction;
 
     private void ConfigureSettings()
     {
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         jumpAction = InputSystem.actions.FindAction("jump");
         interactAction = InputSystem.actions.FindAction("interact");
         lookAction = InputSystem.actions.FindAction("look");
+        attackAction = InputSystem.actions.FindAction("Attack");
     }
     void Start()
     {
@@ -66,6 +68,19 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
             }
 
         }
+        if (attackAction.WasPressedThisFrame()) 
+        {
+            Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
+            {
+                GameObject objectHit = hit.transform.gameObject;
+                if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+                {
+                    damageable.TakeDamage(this.gameObject, combat.GetPhysicalDamage(), EDamageType.physical);
+                }
+            }
+        }
+
     }
 
     void HandleLook()

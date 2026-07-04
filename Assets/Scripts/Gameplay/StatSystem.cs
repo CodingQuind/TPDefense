@@ -1,14 +1,15 @@
 using UnityEngine;
 
-public class StatSystem : MonoBehaviour
+public class StatSystem : MonoBehaviour 
 {
     [Header("Stat System Defaults")]
-    private float currentHealth, maxHealth = StatSystemSettings.defaultHealth;
-    private float currentEnergy, maxEnergy = StatSystemSettings.defaultEnergy;
-    private int level = StatSystemSettings.defaultLevel, currentXp = StatSystemSettings.defaultXp, requiredXp;
+
+    [SerializeField] private float currentHealth, maxHealth = StatSystemSettings.defaultHealth;
+    [SerializeField] private float currentEnergy, maxEnergy = StatSystemSettings.defaultEnergy;
+    [SerializeField] private int level = StatSystemSettings.defaultLevel, currentXp = StatSystemSettings.defaultXp, requiredXp;
 
     [Header("Attributes")]
-    private int baseStrength = 0, baseAgility = 0, baseIntelligence = 0, baseConstitution = 0;
+    [SerializeField] private int baseStrength = 0, baseAgility = 0, baseIntelligence = 0, baseConstitution = 0;
     
     private int basePhysicalDmg = 10, baseMagicDmg = 10;
 
