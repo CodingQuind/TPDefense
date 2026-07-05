@@ -1,28 +1,31 @@
 using UnityEngine;
 
-public class StatSystem : MonoBehaviour 
+public class StatSystem : MonoBehaviour
 {
     [Header("Stat System Defaults")]
+    private float maxHealth = StatSystemSettings.defaultHealth;
+    private float maxEnergy = StatSystemSettings.defaultEnergy;
+    private int level = StatSystemSettings.defaultLevel, currentXp = StatSystemSettings.defaultXp;
+    private float currentEnergy, currentHealth;
+    private int requiredXp;
 
-    [SerializeField] private float currentHealth, maxHealth = StatSystemSettings.defaultHealth;
-    [SerializeField] private float currentEnergy, maxEnergy = StatSystemSettings.defaultEnergy;
-    [SerializeField] private int level = StatSystemSettings.defaultLevel, currentXp = StatSystemSettings.defaultXp, requiredXp;
-
+    // NOTE: Base attributes will be removed and be based on class instead. This is just a temporary solution to get the system working.
     [Header("Attributes")]
-    [SerializeField] private int baseStrength = 0, baseAgility = 0, baseIntelligence = 0, baseConstitution = 0;
-    
-    private int basePhysicalDmg = 10, baseMagicDmg = 10;
+    [SerializeField] private PlayerController playerController;
+    [SerializeField] private int baseStrength = 5, baseAgility = 4, baseIntelligence = 3, baseConstitution = 2;
 
+    private int basePhysicalDmg = 10, baseMagicDmg = 10;
+    private EClasses currentClass = EClasses.Warrior;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void InitializeStats()
@@ -33,7 +36,7 @@ public class StatSystem : MonoBehaviour
     }
 
     // Basic formula for now. just 100 * level
-    private int CalculateRequiredXp(int level) { return level * 100;  }
+    private int CalculateRequiredXp(int level) { return (level^2) * 100; }
 
     private void GrantXp(int xp)
     {
@@ -50,6 +53,14 @@ public class StatSystem : MonoBehaviour
         level += 1;
         currentXp = 0;
         requiredXp = CalculateRequiredXp(level);
+
+        var oldHealth = maxHealth;
+        UpdateMaxHealth();
+        UpdateHealth(maxHealth - oldHealth);
+
+        var oldEnergy = maxEnergy;
+        UpdateMaxEnergy();
+        UpdateEnergy(maxEnergy - oldEnergy);
     }
 
     private void UpdateHealth(float healthToAdd)
@@ -57,11 +68,21 @@ public class StatSystem : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth + healthToAdd, 0, maxHealth);
     }
 
-    private void UpdateMaxHealth(float newMaxHealth)
+    private void UpdateMaxHealth()
     {
-        float diff = newMaxHealth - maxHealth;
+        float newMaxHealth = (baseConstitution * level) * 100;
         maxHealth = newMaxHealth;
-        UpdateHealth(diff);
+    }
+
+    private void UpdateEnergy(float energyToAdd)
+    {
+        currentEnergy = Mathf.Clamp(currentEnergy + energyToAdd, 0, maxEnergy);
+    }
+
+    private void UpdateMaxEnergy()
+    {
+        float newMaxEnergy = (baseIntelligence * level) * 100;
+        maxEnergy = newMaxEnergy;
     }
 
     public void Damage(float damageAmount)
@@ -69,7 +90,7 @@ public class StatSystem : MonoBehaviour
         UpdateHealth(-damageAmount);
     }
 
-    public void Heal(float healAmount) 
+    public void Heal(float healAmount)
     {
         UpdateHealth(healAmount);
     }
@@ -78,8 +99,51 @@ public class StatSystem : MonoBehaviour
     public int GetAgility() { return baseAgility; }
     public int GetIntelligence() { return baseIntelligence; }
     public int GetConstitution() { return baseConstitution; }
-    public int GetPhysicalDamage() { return basePhysicalDmg; }
-    public int GetMagicDamage() { return baseMagicDmg; }
-
-
+    public int GetPhysicalDamage() 
+    {
+        switch (currentClass)
+        {
+            case EClasses.Warrior:
+            case EClasses.Mage:
+            case EClasses.Builder:
+                return basePhysicalDmg + (baseStrength * 2);
+            case EClasses.Assassin:
+                return basePhysicalDmg + (baseAgility * 2);
+            default:
+                return basePhysicalDmg;
+        }
+    }
+    public int GetMagicDamage() { return baseMagicDmg + (baseIntelligence * 2); }
+    public void ClassUpdate(EClasses newClass)
+    {
+        // Hardcoded values, later could be in a datatable
+        switch (newClass)
+        {
+            case EClasses.Warrior:
+                baseStrength = 12;
+                baseAgility = 5;
+                baseIntelligence = 2;
+                baseConstitution = 8;
+                break;
+            case EClasses.Assassin:
+                baseStrength = 7;
+                baseAgility = 12;
+                baseIntelligence = 3;
+                baseConstitution = 5;
+                break;
+            case EClasses.Mage:
+                baseStrength = 3;
+                baseAgility = 4;
+                baseIntelligence = 14;
+                baseConstitution = 4;
+                break;
+            case EClasses.Builder:
+                baseStrength = 4;
+                baseAgility = 4;
+                baseIntelligence = 4;
+                baseConstitution = 4;
+                break;   
+        }
+        currentClass = newClass;
+    }
 }

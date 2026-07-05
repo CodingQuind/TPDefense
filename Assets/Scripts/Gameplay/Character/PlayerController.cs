@@ -1,3 +1,6 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,7 +18,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     public Camera playerCamera;
 
     [Header("Combat")]
-    [SerializeField] private EClasses playerClass;
+    [SerializeField] private EClasses playerClass = EClasses.Warrior;
     [SerializeField] private CombatSystem combat;
 
     // --- Private Variables ---
@@ -28,6 +31,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private Vector3 smoothedMove;
 
     // Input Actions
+    private List<InputAction> actions = new();
     private InputAction sprintAction, moveAction, jumpAction;
     private InputAction lookAction;
     private InputAction interactAction, attackAction;
@@ -42,12 +46,18 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         interactAction = InputSystem.actions.FindAction("interact");
         lookAction = InputSystem.actions.FindAction("look");
         attackAction = InputSystem.actions.FindAction("Attack");
+        actions.Add(sprintAction);
+        actions.Add(moveAction);
+        actions.Add(jumpAction);
+        actions.Add(interactAction);
+        actions.Add(lookAction);
+        actions.Add(attackAction);
     }
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
         ConfigureSettings();
+
     }
 
     void Update()
@@ -58,7 +68,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         if (interactAction.WasPressedThisFrame())
         {
             Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Physics.Raycast(ray, out RaycastHit hit, CharacterSettings.interactRange))
             {
                 GameObject objectHit = hit.transform.gameObject;
                 if (objectHit.TryGetComponent<IInteractInterface>(out var interactable))
@@ -70,6 +80,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         }
         if (attackAction.WasPressedThisFrame()) 
         {
+            combat.PlayAttackAnimation();
             Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
             if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
             {
@@ -156,6 +167,32 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         if (target.TryGetComponent<IDamageableInterface>(out var component)) {
         component.TakeDamage(this.gameObject, damage, damageType);
         }
+    }
+
+    public void EnablePlayer()
+    {
+        foreach (InputAction action in actions)
+        {
+            action.Enable();
+        }
+    }
+
+    public void DisablePlayer()
+    {
+        foreach(InputAction action in actions ) 
+        {
+            action.Disable();
+        }
+    }
+
+    public void SelectClass(EClasses newClass)
+    {
+        playerClass = newClass;
+    }
+
+    public EClasses GetClass()
+    {
+        return playerClass;
     }
 
 }
