@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class UpgradePanel : MonoBehaviour
 {
-    private Upgrade upgrade;
+    private UpgradeObject upgrade;
     public Image upgradeIcon;
     public TMPro.TMP_Text upgradeNameText;
     public TMPro.TMP_Text upgradeCostText;
 
-    public void SetUpgrade(Upgrade upgrade)
+    public void SetUpgrade(UpgradeObject upgrade)
     {
         this.upgrade = upgrade;
         upgradeIcon.sprite = upgrade.icon;

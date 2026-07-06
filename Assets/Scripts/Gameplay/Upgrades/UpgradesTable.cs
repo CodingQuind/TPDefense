@@ -3,25 +3,25 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "UpgradesTable", menuName = "Scriptable Objects/UpgradesTable")]
 public class UpgradesTable : ScriptableObject
 {
-    public Upgrade[] upgrades;
+    public UpgradeObject[] upgrades;
     public string upgradeTableName = "default";
-    public Upgrade GetUpgradeByName(string name)
+    public UpgradeObject GetUpgradeByName(string name)
     {
-        foreach (Upgrade upgrade in upgrades)
+        foreach (UpgradeObject upgrade in upgrades)
         {
-            if (upgrade.name == name)
+            if (upgrade.upgradeName == name)
             {
                 return upgrade;
             }
         }
-        return null;
+        throw new System.Exception($"Upgrade with name {name} not found in table {upgradeTableName}");
     }
 
-    public Upgrade GetUpgradeByIndex(int index)
+    public UpgradeObject GetUpgradeByIndex(int index)
     {
         if (index < 0 || index >= upgrades.Length)
         {
-            return null;
+            throw new System.Exception("Index out of range for upgrades table " + upgradeTableName);
         }
         return upgrades[index];
     }

@@ -37,12 +37,12 @@ public class UpgradesScript : MonoBehaviour
         }
 
         int count = upgradeTable.upgrades.Length;
-        float spacing = 200f;
+        float spacing = 400f;
         float startX = -((count - 1) * spacing) / 2f;
         int i = 0;
 
 
-        foreach (Upgrade upgrade in upgradeTable.upgrades)
+        foreach (UpgradeObject upgrade in upgradeTable.upgrades)
         {
             UpgradePanel panel = Instantiate(upgradePanelPrefab, transform);
             RectTransform rect = panel.GetComponent<RectTransform>();
