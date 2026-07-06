@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class ResourceSystem
+public class ResourceSystem : MonoBehaviour
 {
     public int startingMoney = 50;
     private int money, moneyRegenRate = GameSettings.moneyRegenAmt;
@@ -17,5 +17,5 @@ public class ResourceSystem
         money -= amt;
         return true;
     }
-    public string Money() { return money + " money"; }
+    public int Money() { return money; }
 }

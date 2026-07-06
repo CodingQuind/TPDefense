@@ -9,13 +9,16 @@ public class UpgradePanel : MonoBehaviour
     public Image upgradeIcon;
     public TMPro.TMP_Text upgradeNameText;
     public TMPro.TMP_Text upgradeCostText;
+    public Button upgradeButton;
+    public Sprite upgradeCompleteIcon;
 
-    public void SetUpgrade(UpgradeObject upgrade)
+    public void SetUpgrade(UpgradeObject upgrade, UpgradesScript scriptRef)
     {
         this.upgrade = upgrade;
         upgradeIcon.sprite = upgrade.icon;
         upgradeNameText.text = upgrade.upgradeName;
         upgradeCostText.text = upgrade.cost.ToString() + "g";
+        upgradeButton.onClick.AddListener(() => scriptRef.CommitUpgrade(upgrade, this));
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

@@ -1,41 +1,53 @@
-using NUnit.Framework;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class UpgradesScript : MonoBehaviour
 {
-    public UpgradesTable[] upgradeTables;
+    public List<UpgradeEntry> entries;
+    public Dictionary<EClasses, UpgradesTable> upgradeTables = new();
     public UpgradePanel upgradePanelPrefab;
     private List<UpgradePanel> activePanels = new();
     private EClasses curClass = EClasses.Warrior;
     private UpgradesTable upgradeTable;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private GameObject playerRef;
+    private PlayerController controller;
     void Start()
     {
-        upgradeTable = upgradeTables[0];
-        foreach (UpgradesTable uT in upgradeTables)
-        {
-            upgradeTable = uT.GetName() == curClass.ToString() ? uT : upgradeTable;
-        }
 
+        foreach (var entry in entries)
+            upgradeTables[entry.key] = entry.value;
+
+        playerRef = GameObject.FindGameObjectWithTag("Player");
+        controller = playerRef.GetComponent<PlayerController>();
+        curClass = controller.GetClass();
+        upgradeTable = upgradeTables[curClass];
         RefreshPanel();
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
 
-    void RefreshClass(EClasses eClass) { curClass = eClass; }
+    public void RefreshClass() 
+    { 
+        curClass = controller.GetClass();
+        upgradeTable = upgradeTables[curClass];
+    }
 
-    private void RefreshPanel()
+    public void RefreshPanel()
     {
-        foreach (UpgradePanel p in activePanels)
+        if (activePanels.Count > 0)
         {
-            Destroy(p.gameObject);
+            foreach (UpgradePanel p in activePanels)
+            {
+                Destroy(p.gameObject);
+            }
         }
-
+        activePanels.Clear();
+        RefreshClass();
         int count = upgradeTable.upgrades.Length;
         float spacing = 400f;
         float startX = -((count - 1) * spacing) / 2f;
@@ -47,9 +59,32 @@ public class UpgradesScript : MonoBehaviour
             UpgradePanel panel = Instantiate(upgradePanelPrefab, transform);
             RectTransform rect = panel.GetComponent<RectTransform>();
             rect.anchoredPosition = new Vector2(startX + i * spacing, 0);
-            panel.SetUpgrade(upgrade);
+            panel.SetUpgrade(upgrade, this);
             activePanels.Add(panel);
             i++;
         }
     }
+    [System.Serializable]
+    public struct UpgradeEntry
+    {
+        public EClasses key;
+        public UpgradesTable value;
+    }
+
+    public UpgradeObject CommitUpgrade(UpgradeObject upgrade, UpgradePanel panel)
+    {
+        int availFunds = controller.GetMoney();
+        if (availFunds >= upgrade.cost)
+        {
+            controller.SpendMoney(upgrade.cost);
+            controller.ApplyStatUpgrade(upgrade);
+            panel.upgradeIcon.sprite = panel.upgradeCompleteIcon;
+            panel.upgradeButton.interactable = false;
+            panel.upgradeButton.GetComponentInChildren<TMP_Text>().text = "";
+            panel.upgradeCostText.text = "Purchased";
+        }
+        return upgrade;
+    }
 }
+
+

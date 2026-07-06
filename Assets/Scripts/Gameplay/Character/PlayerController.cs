@@ -17,9 +17,11 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     public float mouseSensitivity = 5f;
     public Camera playerCamera;
 
-    [Header("Combat")]
+    [Header("Combat/Class")]
     [SerializeField] private EClasses playerClass = EClasses.Warrior;
-    [SerializeField] private CombatSystem combat;
+    private CombatSystem combat;
+    private StatSystem stats;
+    private ResourceSystem resources;
 
     // --- Private Variables ---
     // Movement and Look
@@ -52,6 +54,10 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         actions.Add(interactAction);
         actions.Add(lookAction);
         actions.Add(attackAction);
+        // Component References
+        combat = GetComponent<CombatSystem>();
+        stats = GetComponent<StatSystem>();
+        resources = GetComponent<ResourceSystem>();
     }
     void Start()
     {
@@ -79,15 +85,18 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
         }
         if (attackAction.WasPressedThisFrame()) 
-        {
-            combat.PlayAttackAnimation();
-            Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
+        {   
+            if (combat.CanAttack())
             {
-                GameObject objectHit = hit.transform.gameObject;
-                if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+                float damage = combat.Attack(EDamageType.physical);
+                Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
+                if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
                 {
-                    damageable.TakeDamage(this.gameObject, combat.GetPhysicalDamage(), EDamageType.physical);
+                    GameObject objectHit = hit.transform.gameObject;
+                    if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+                    {
+                        damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
+                    }
                 }
             }
         }
@@ -193,6 +202,21 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     public EClasses GetClass()
     {
         return playerClass;
+    }
+
+    public int GetMoney()
+    {
+        return resources.Money();
+    }
+
+    public void SpendMoney(int amt)
+    {
+        resources.RemoveMoney(amt);
+    }
+
+    public void ApplyStatUpgrade(UpgradeObject upgrade)
+    {
+        stats.AddUpgrade(upgrade);
     }
 
 }

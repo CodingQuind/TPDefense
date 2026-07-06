@@ -17,17 +17,17 @@ MonoBehaviour:
     cost: 200
     statUpgradesList:
     - upgradeType: 0
-      statMultiplier: 5
+      upgradeValue: 5
       duration: 0
     - upgradeType: 4
-      statMultiplier: 1
+      upgradeValue: 1
       duration: 0
     icon: {fileID: 21300000, guid: 19e918e9993d7704681b0c166a27cbff, type: 3}
   - upgradeName: Rigorous Conditioning
     cost: 200
     statUpgradesList:
     - upgradeType: 3
-      statMultiplier: 10
+      upgradeValue: 0
       duration: 0
     icon: {fileID: 21300000, guid: 19e918e9993d7704681b0c166a27cbff, type: 3}
   upgradeTableName: Warrior

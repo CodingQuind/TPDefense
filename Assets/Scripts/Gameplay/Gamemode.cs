@@ -2,16 +2,17 @@ using UnityEngine;
 
 public class Gamemode : MonoBehaviour
 {
-    public ResourceSystem resourceSystem;
     public GameObject playerObject;
     private float resourceRegenTimer, regenInterval = 1f;
     private PlayerController playerController;
+    private ResourceSystem resourceSystem;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        playerController = playerObject.GetComponent<PlayerController>();
+        resourceSystem = playerController.gameObject.GetComponent<ResourceSystem>();
         resourceRegenTimer = 0f;
         resourceSystem.Start();
-        playerController = playerObject.GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
@@ -22,7 +23,6 @@ public class Gamemode : MonoBehaviour
         {
             resourceRegenTimer = 0;
             resourceSystem.AddMoney(GameSettings.moneyRegenAmt);
-            Debug.Log(resourceSystem.Money());
         }
     }
 

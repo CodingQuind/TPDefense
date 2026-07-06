@@ -18,7 +18,11 @@ public class StoreScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        curClass = controller.GetClass();
-        classText.text = "Current Class: " + curClass.ToString();
+        if (controller.GetClass() != curClass)
+        {
+            curClass = controller.GetClass();
+            classText.text = "Current Class: " + curClass.ToString();
+        }
+        
     }
 }

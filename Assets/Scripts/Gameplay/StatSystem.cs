@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StatSystem : MonoBehaviour
@@ -13,9 +15,11 @@ public class StatSystem : MonoBehaviour
     [Header("Attributes")]
     [SerializeField] private PlayerController playerController;
     [SerializeField] private int baseStrength = 5, baseAgility = 4, baseIntelligence = 3, baseConstitution = 2;
+    private int speedModifier = 1, jumpModifier = 1;
 
     private int basePhysicalDmg = 10, baseMagicDmg = 10;
     private EClasses currentClass = EClasses.Warrior;
+    private List<UpgradeObject> appliedUpgrades = new List<UpgradeObject>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -113,6 +117,8 @@ public class StatSystem : MonoBehaviour
                 return basePhysicalDmg;
         }
     }
+    public int GetLevel() { return level; }
+
     public int GetMagicDamage() { return baseMagicDmg + (baseIntelligence * 2); }
     public void ClassUpdate(EClasses newClass)
     {
@@ -145,5 +151,42 @@ public class StatSystem : MonoBehaviour
                 break;   
         }
         currentClass = newClass;
+    }
+
+    public void AddUpgrade(UpgradeObject upgrade)
+    {
+        appliedUpgrades.Add(upgrade);
+        foreach (var statUpgrade in upgrade.statUpgradesList)
+        {
+            switch (statUpgrade.upgradeType)
+            {
+                case EUpgradeType.strength:
+                    baseStrength += statUpgrade.upgradeValue;
+                    break;
+                case EUpgradeType.agility:
+                    baseAgility += statUpgrade.upgradeValue;
+                    break;
+                case EUpgradeType.intelligence:
+                    baseIntelligence += statUpgrade.upgradeValue;
+                    UpdateMaxEnergy();
+                    break;
+                case EUpgradeType.constitution:
+                    baseConstitution += statUpgrade.upgradeValue;
+                    UpdateMaxHealth();
+                    break;
+                case EUpgradeType.speed:
+                    speedModifier += statUpgrade.upgradeValue;
+                    break;
+                case EUpgradeType.jumpHeight:
+                    jumpModifier += statUpgrade.upgradeValue;
+                    break;
+                case EUpgradeType.moneyGen:
+                    // Implement money generation upgrade logic
+                    break;
+                case EUpgradeType.spellCooldown:
+                    // Implement spell cooldown reduction logic
+                    break;
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ public class CombatSystem : MonoBehaviour
 
     private int physicalDmg, magicDmg;
     private float attackRange = 4f, castTimer = 0f, cooldown = 1f;
+    public bool attacking { get; private set; } = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,7 +24,10 @@ public class CombatSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (castTimer < cooldown)
+        {
+            castTimer += Time.deltaTime;
+        }
     }
 
     public float GetAttackRange()
@@ -41,13 +45,30 @@ public class CombatSystem : MonoBehaviour
         return magicDmg;
     }
 
-    public void PlayAttackAnimation()
+    public bool CanAttack()
+    {
+        return castTimer >= cooldown && !attacking;
+    }
+
+    public float Attack(EDamageType type)
+    {
+        if (castTimer >= cooldown & !attacking)
+        {
+            attacking = true;
+            PlayAttackAnimation();
+            castTimer = 0f;
+            return type == EDamageType.physical ? GetPhysicalDamage() : GetMagicDamage();
+        }
+        return 0f;
+    }
+    private void PlayAttackAnimation()
     {
         if (weaponRoot != null)
         {
             StartCoroutine("AnimateAttack");
         }
     }
+
 
     private System.Collections.IEnumerator AnimateAttack()
     {
@@ -65,5 +86,6 @@ public class CombatSystem : MonoBehaviour
 
         // Reset rotation after attack
         weaponRoot.transform.localRotation = initialRotation;
+        attacking = false;
     }
 }

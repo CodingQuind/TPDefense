@@ -102,7 +102,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 0}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -490,6 +490,8 @@ MonoBehaviour:
   upgradeIcon: {fileID: 110854166266187326}
   upgradeNameText: {fileID: 7445763467850332783}
   upgradeCostText: {fileID: 7674455123087384951}
+  upgradeButton: {fileID: 7112605107928524892}
+  upgradeCompleteIcon: {fileID: 21300000, guid: 9a7b7199edd1cb44ca2745dcc3f49bb5, type: 3}
 --- !u!1 &7553371930408355653
 GameObject:
   m_ObjectHideFlags: 0

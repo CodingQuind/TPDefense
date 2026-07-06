@@ -4,13 +4,13 @@ using UnityEngine;
 public struct UpgradeStruct
 {
     public EUpgradeType upgradeType;
-    public float statMultiplier;
+    public int upgradeValue;
     public float duration;
 
-    public UpgradeStruct(EUpgradeType type, float multiplier, float duration)
+    public UpgradeStruct(EUpgradeType type, int value, float duration)
     {
         upgradeType = type;
-        this.statMultiplier = multiplier;
+        this.upgradeValue = value;
         this.duration = duration;
     }
 }
