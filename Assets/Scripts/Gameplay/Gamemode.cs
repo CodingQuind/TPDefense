@@ -6,23 +6,26 @@ public class Gamemode : MonoBehaviour
     private float resourceRegenTimer, regenInterval = 1f;
     private PlayerController playerController;
     private ResourceSystem resourceSystem;
+    private bool started;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerController = playerObject.GetComponent<PlayerController>();
         resourceSystem = playerController.gameObject.GetComponent<ResourceSystem>();
         resourceRegenTimer = 0f;
-        resourceSystem.Start();
     }
 
     // Update is called once per frame
     void Update()
     {
-        resourceRegenTimer += Time.deltaTime;
-        if (resourceRegenTimer >= regenInterval)
-        {
-            resourceRegenTimer = 0;
-            resourceSystem.AddMoney(GameSettings.moneyRegenAmt);
+        if (started) 
+        {    
+            resourceRegenTimer += Time.deltaTime;
+            if (resourceRegenTimer >= regenInterval)
+            {
+                resourceRegenTimer = 0;
+                resourceSystem.AddMoney(GameSettings.moneyRegenAmt);
+            }
         }
     }
 
@@ -37,5 +40,11 @@ public class Gamemode : MonoBehaviour
         playerController.EnablePlayer();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void StartGame()
+    {
+        resourceSystem.Start();
+        started = true;
     }
 }
