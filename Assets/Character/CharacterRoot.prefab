@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &281244131132471030
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2570901971276777859}
+  m_Layer: 0
+  m_Name: enemyTargetTag
+  m_TagString: EnemyTarget
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2570901971276777859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281244131132471030}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7111197260066708818}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3809007016123264311
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,12 +324,13 @@ GameObject:
   m_Component:
   - component: {fileID: 7111197260066708818}
   - component: {fileID: 2900891153355399773}
+  - component: {fileID: 6083400131109422419}
   - component: {fileID: 423737800105582059}
   - component: {fileID: 360807448383422977}
   - component: {fileID: 9151345524773116874}
   m_Layer: 0
   m_Name: CharacterRoot
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -318,6 +350,7 @@ Transform:
   m_Children:
   - {fileID: 9032673865869077868}
   - {fileID: 1306225827086197132}
+  - {fileID: 2570901971276777859}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &2900891153355399773
@@ -339,7 +372,19 @@ MonoBehaviour:
   mouseSensitivity: 5
   playerCamera: {fileID: 2310274176806590852}
   playerClass: 0
-  combat: {fileID: 360807448383422977}
+--- !u!114 &6083400131109422419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4459820646755566022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce3d724ff8f99ab4d8e6517f6a2b283a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceSystem
+  startingMoney: 50
 --- !u!114 &423737800105582059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,10 +397,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e884114b907e88842900cc036943cffa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatSystem
-  maxHealth: 100
-  maxEnergy: 100
-  level: 1
-  currentXp: 0
   playerController: {fileID: 2900891153355399773}
   baseStrength: 5
   baseAgility: 4

@@ -36,6 +36,7 @@ public class MainMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         mainPage.SetActive(false);
+        gmControls.StartGame();
     }
 
     // ---Store Interactions---
