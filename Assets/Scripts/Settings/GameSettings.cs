@@ -17,6 +17,6 @@ public static class CharacterSettings
 [System.Serializable]
 public static class StatSystemSettings
 {
-    public static float defaultHealth = 100, defaultEnergy = 100;
+    public static float defaultHealth = 1000, defaultEnergy = 100;
     public static int defaultLevel = 1, defaultXp = 0;
 }

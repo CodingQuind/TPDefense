@@ -18,7 +18,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     private int checkpointIndex;
     private float attackTimer = 0f, attackInterval = 1f;
 
-    public enum AIState { Patrol, Chase, Attack }
+    public enum AIState { Patrol, Chase, Attack, Dying }
     public AIState state = AIState.Patrol;
 
     public float detectionRange = 10f;
@@ -31,7 +31,10 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
 
     public void TakeDamage(GameObject attacker, float damage, EDamageType damageType)
     {
-        throw new System.NotImplementedException();
+        if (stats.Damage(damage))
+        {
+            KillSelf();
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -110,6 +113,8 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
                     Attack(currentTarget);
                 }
                 break;
+            case AIState.Dying:
+                break;
         }
         //float distance = Vector3.Distance(gameObject.transform.position + (Vector3.up * 2), FindMoveTarget());
         //if (distance > stopDistance)
@@ -147,7 +152,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
 
             float dist = Vector3.Distance(transform.position, closestPoint);
 
-            if (dist < minDist)
+            if (dist < minDist && e.activeSelf == true)
             {
                 minDist = dist;
                 closest = col.gameObject; // return the object that actually has the collider
@@ -183,16 +188,17 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         transform.rotation = Quaternion.LookRotation(dir);
         // Trigger your animation
         var hit = target.GetComponent<IDamageableInterface>();
-        if (attackTimer >= attackInterval)
+        if (attackTimer >= attackInterval && target.activeSelf == true)
         {
             if (hit != null)
             {
                 hit.TakeDamage(this.gameObject, stats.GetPhysicalDamage(), EDamageType.physical);
+                Debug.Log("[EnemyBehavior] DEBUG: hitting target for " + stats.GetPhysicalDamage() + " damage.");
                 animSystem.SetTrigger("attack");
                 attackTimer = 0f;
             }
         }
-        else animSystem.SetTrigger("attack");
+        
     }
 
 
@@ -215,5 +221,14 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         {
             this.checkpoints.Add(check);
         }
+    }
+
+    private void KillSelf()
+    {
+        animSystem.SetTrigger("dead");
+        navAgent.enabled = false;
+        state = AIState.Dying;
+
+        Destroy(gameObject, 3f);
     }
 }

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,10 +9,11 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 {
     // --- Public Variables ---
     [Header("Movement")]
-    public float baseMoveSpeed = CharacterSettings.characterSpeed; 
+    public float baseMoveSpeed = CharacterSettings.characterSpeed;
     public float baseSprintSpeed = CharacterSettings.characterSprintSpeed;
     public float jumpHeight = 1.2f;
     public float gravity = -9.81f;
+    private bool playerEnabled = false;
 
     [Header("Mouse Look")]
     public float mouseSensitivity = 5f;
@@ -22,6 +24,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private CombatSystem combat;
     private StatSystem stats;
     private ResourceSystem resources;
+    private GameObject targetTag;
 
     // --- Private Variables ---
     // Movement and Look
@@ -37,6 +40,8 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private InputAction sprintAction, moveAction, jumpAction;
     private InputAction lookAction;
     private InputAction interactAction, attackAction;
+
+    private Transform respawnPoint;
 
     private void ConfigureSettings()
     {
@@ -58,49 +63,64 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         combat = GetComponent<CombatSystem>();
         stats = GetComponent<StatSystem>();
         resources = GetComponent<ResourceSystem>();
+        targetTag = GameObject.Find("enemyTargetTagPlayer");
+        stats.InitializeStats();
+        playerEnabled = true;
+        
     }
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        ConfigureSettings();
+        respawnPoint = GameObject.FindGameObjectWithTag("Respawn").transform;
 
+    }
+
+
+    public void StartPlayer()
+    {
+        ConfigureSettings();
     }
 
     void Update()
     {
-        HandleLook();
-        HandleMovement();
-
-        if (interactAction.WasPressedThisFrame())
+        if (playerEnabled)
         {
-            Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, CharacterSettings.interactRange))
-            {
-                GameObject objectHit = hit.transform.gameObject;
-                if (objectHit.TryGetComponent<IInteractInterface>(out var interactable))
-                {
-                    interactable.Interact(this.gameObject);
-                }
-            }
+            HandleLook();
+            HandleMovement();
 
-        }
-        if (attackAction.WasPressedThisFrame()) 
-        {   
-            if (combat.CanAttack())
+            if (interactAction.WasPressedThisFrame())
             {
-                float damage = combat.Attack(EDamageType.physical);
                 Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
-                if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
+                if (Physics.Raycast(ray, out RaycastHit hit, CharacterSettings.interactRange))
                 {
                     GameObject objectHit = hit.transform.gameObject;
-                    if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+                    if (objectHit.TryGetComponent<IInteractInterface>(out var interactable))
                     {
-                        damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
+                        interactable.Interact(this.gameObject);
+                    }
+                }
+
+            }
+            if (attackAction.WasPressedThisFrame())
+            {
+                if (combat.CanAttack())
+                {
+                    float damage = combat.Attack(EDamageType.physical);
+                    Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
+                    if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
+                    {
+                        GameObject objectHit = hit.transform.gameObject;
+                        if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+                        {
+                            Debug.Log("Hitting " + objectHit.name + " for " + damage + " damage.");
+                            damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
+                        }
                     }
                 }
             }
-        }
 
+            
+        }
     }
 
     void HandleLook()
@@ -137,7 +157,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         Vector2 moveInput = moveAction.ReadValue<Vector2>();
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         smoothedMove = Vector3.Lerp(smoothedMove, move, Time.deltaTime * moveAcceleration);
-        
+
         // --- Jump ---
         if (isGroundedBuffered)
         {
@@ -148,8 +168,8 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         }
 
         // --- Sprint ---
-        float targetSpeed = sprintAction.IsPressed() 
-                            ? baseSprintSpeed 
+        float targetSpeed = sprintAction.IsPressed()
+                            ? baseSprintSpeed
                             : baseMoveSpeed;
 
         moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, Time.deltaTime * moveAcceleration);
@@ -169,12 +189,16 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void TakeDamage(GameObject attacker, float damage, EDamageType damageType)
     {
-        //Apply damage to stat system
+        if (stats.Damage(damage))
+        {
+            KillSelf();
+        }
     }
     public void DamageTarget(GameObject target, float damage, EDamageType damageType)
     {
-        if (target.TryGetComponent<IDamageableInterface>(out var component)) {
-        component.TakeDamage(this.gameObject, damage, damageType);
+        if (target.TryGetComponent<IDamageableInterface>(out var component))
+        {
+            component.TakeDamage(this.gameObject, damage, damageType);
         }
     }
 
@@ -188,7 +212,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void DisablePlayer()
     {
-        foreach(InputAction action in actions ) 
+        foreach (InputAction action in actions)
         {
             action.Disable();
         }
@@ -219,4 +243,44 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         stats.AddUpgrade(upgrade);
     }
 
+    private void KillSelf()
+    {
+        Debug.Log("Player has died.");
+        foreach (InputAction action in actions) 
+        {
+            action.Disable();
+        }
+        StartCoroutine(RespawnTimer(4f));
+
+    }
+
+    private float respawnGracePeriod = 3f;
+    private IEnumerator RespawnTimer(float respawnTime)
+    {
+        Debug.Log("Player respawning in " + respawnTime + " seconds.");
+        StartCoroutine(GracePeriod(respawnTime + respawnGracePeriod));
+        yield return new WaitForSeconds(respawnTime);
+        Respawn();
+    }
+
+    public void Respawn()
+    {
+        Debug.Log("Player has respawned.");
+        gameObject.transform.position = respawnPoint.position;
+        gameObject.transform.rotation = respawnPoint.rotation;
+        foreach (InputAction action in actions)
+        {
+            action.Enable();
+        }
+        
+    }
+
+    private IEnumerator GracePeriod(float graceTime)
+    {
+        Debug.Log("Grace period started for " + graceTime + " seconds.");
+        targetTag.SetActive(false);
+        yield return new WaitForSeconds(graceTime);
+        targetTag.SetActive(true);
+        Debug.Log("Grace period ended.");
+    }
 }

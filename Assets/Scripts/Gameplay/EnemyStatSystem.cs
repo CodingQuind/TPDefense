@@ -75,7 +75,7 @@ public class EnemyStatSystem : MonoBehaviour
 
     private void UpdateMaxHealth()
     {
-        float newMaxHealth = (baseConstitution * level) * 100;
+        float newMaxHealth = (baseConstitution * level) * 1000;
         maxHealth = newMaxHealth;
     }
 
@@ -90,9 +90,10 @@ public class EnemyStatSystem : MonoBehaviour
         maxEnergy = newMaxEnergy;
     }
 
-    public void Damage(float damageAmount)
+    public bool Damage(float damageAmount)
     {
         UpdateHealth(-damageAmount);
+        return currentHealth <= 0;
     }
 
     public void Heal(float healAmount)
@@ -111,9 +112,9 @@ public class EnemyStatSystem : MonoBehaviour
             case EClasses.Warrior:
             case EClasses.Mage:
             case EClasses.Builder:
-                return basePhysicalDmg + (baseStrength * 2);
+                return (int)(basePhysicalDmg + (baseStrength * 1.4f));
             case EClasses.Assassin:
-                return basePhysicalDmg + (baseAgility * 2);
+                return (int)(basePhysicalDmg + (baseAgility * 1.2f));
             default:
                 return basePhysicalDmg;
         }

@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 4519109582456680174}
   - component: {fileID: 401808717206573494}
   - component: {fileID: 5053150159853580536}
-  - component: {fileID: 3124021447573498184}
+  - component: {fileID: 1567704388594024194}
   m_Layer: 0
   m_Name: WeaponModel
   m_TagString: Untagged
@@ -58,13 +58,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3809007016123264311}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13052616, y: -0, z: -0, w: 0.9914449}
-  m_LocalPosition: {x: 0.576, y: 0.666, z: 0.145}
-  m_LocalScale: {x: 0.15, y: 0.8000001, z: 0.15000002}
+  m_LocalRotation: {x: 0.09800796, y: 0.80363, z: 0.13804841, w: 0.57054013}
+  m_LocalPosition: {x: 0.576, y: 0.227, z: -0.01}
+  m_LocalScale: {x: 1.2, y: 1.5, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8903467927908427213}
-  m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -6.318, y: 108.225, z: 18.48}
 --- !u!33 &401808717206573494
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -72,7 +72,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3809007016123264311}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -9035476687761559398, guid: a1f67aa07796fb24d9b3adf4cc449805, type: 3}
 --- !u!23 &5053150159853580536
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -98,7 +98,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 300ee636ab1b3b7429c61eaa1f29b0b8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -122,8 +122,8 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &3124021447573498184
-CapsuleCollider:
+--- !u!64 &1567704388594024194
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -140,11 +140,10 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -9035476687761559398, guid: a1f67aa07796fb24d9b3adf4cc449805, type: 3}
 --- !u!1 &4137875171979922818
 GameObject:
   m_ObjectHideFlags: 0

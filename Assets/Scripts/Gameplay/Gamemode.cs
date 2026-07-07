@@ -56,6 +56,7 @@ public class Gamemode : MonoBehaviour
     {
         resourceSystem.Start();
         started = true;
+        playerController.StartPlayer();
     }
 
     private void SpawnEnemies()
