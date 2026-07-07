@@ -1,19 +1,20 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class AnimaterScript : MonoBehaviour
 {
     Animator anim;
-    CharacterController controller;
+    NavMeshAgent agent;
 
     void Start()
     {
         anim = gameObject.GetComponent<Animator>();
-        controller = gameObject.GetComponent<CharacterController>();
+        agent = gameObject.GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
-        float speed = controller.velocity.magnitude;
+        float speed = agent.velocity.magnitude;
         anim.SetFloat("speed", speed);
     }
 }
