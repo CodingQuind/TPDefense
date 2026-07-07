@@ -6,6 +6,10 @@ public class Gamemode : MonoBehaviour
     private float resourceRegenTimer, regenInterval = 1f;
     private PlayerController playerController;
     private ResourceSystem resourceSystem;
+    [SerializeField] private GameObject[] spawners;
+    [SerializeField] private GameObject enemyPrefab;
+    private float enemyTimer = 0f, waveTimer = 10f;
+    private SpawnerBehavior spawnControl;
     private bool started;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,10 +25,16 @@ public class Gamemode : MonoBehaviour
         if (started) 
         {    
             resourceRegenTimer += Time.deltaTime;
+            enemyTimer += Time.deltaTime;
             if (resourceRegenTimer >= regenInterval)
             {
                 resourceRegenTimer = 0;
                 resourceSystem.AddMoney(GameSettings.moneyRegenAmt);
+            }
+            if (enemyTimer >= waveTimer)
+            {
+                SpawnEnemies();
+                enemyTimer = 0f;
             }
         }
     }
@@ -46,5 +56,14 @@ public class Gamemode : MonoBehaviour
     {
         resourceSystem.Start();
         started = true;
+    }
+
+    private void SpawnEnemies()
+    {
+        foreach( GameObject spawner in spawners)
+        {
+            spawnControl = spawner.GetComponent<SpawnerBehavior>();
+            spawnControl.SpawnEnemies(enemyPrefab, 3);
+        }
     }
 }

@@ -207,4 +207,13 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         if (targetCollider == null)
             Debug.LogWarning($"No collider found for target {t.name}");
     }
+
+    public void SetCheckpoints(Checkpoint[] checkpoints)
+    {
+        this.checkpoints = new();
+        foreach(var check in checkpoints)
+        {
+            this.checkpoints.Add(check);
+        }
+    }
 }

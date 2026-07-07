@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 850b61b6932541a45b9c9c282c78d5cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gamemode
-  resourceSystem:
-    startingMoney: 100
   playerObject: {fileID: 0}
+  spawners: []
+  enemyPrefab: {fileID: 5919829329208225890, guid: 06edaa8360300bd48a7627ab72152a22, type: 3}
