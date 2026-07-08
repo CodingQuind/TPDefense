@@ -1,21 +1,49 @@
 using System.Collections;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class HUDScript : MonoBehaviour
 {
     [SerializeField] private Image healthFillImage;
+    [SerializeField] private Image attackbarFill;
+    [SerializeField] private GameObject buildMenu;
+    [SerializeField] private GameObject buildingPanelPrefab;
+    private Image background;
+    private PlayerController playerRef;
     private StatSystem playerStats;
+    private GameObject overlay;
+    private GameObject deathPanel;
+
+    private TMP_Text alertText;
+    private GameObject buildButton;
     private float currentHealth, maxHealth;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        playerStats = GameObject.FindGameObjectWithTag("Player").GetComponent<StatSystem>();
+        playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        playerStats = playerRef.GetComponent<StatSystem>();
         currentHealth = playerStats.maxHealth;
         maxHealth = playerStats.maxHealth;
+        alertText = GameObject.Find("AlertText").GetComponent<TMP_Text>();
+        alertText.text = "";
+        background = gameObject.GetComponent<Image>();
+        background.enabled = false;
+        GetComponent<Canvas>().enabled = false;
+        overlay = GameObject.Find("Overlay");
+        overlay.SetActive(false);
+        buildButton = GameObject.Find("BuildButton");
+        deathPanel = GameObject.Find("DeathPanel");
+        deathPanel.SetActive(false);
     }
 
+    public void StartHud()
+    {
+        GetComponent<Canvas>().enabled = true;
+        overlay.SetActive(true);
+    }
     // Update is called once per frame
     void Update()
     {
@@ -45,9 +73,146 @@ public class HUDScript : MonoBehaviour
         healthFillImage.fillAmount = currentHealth / maxHealth;
     }
 
+    public IEnumerator AnimateAttackbar(float cooldown)
+    {
+        float elapsed = 0f;
+        while (elapsed < cooldown)
+        {
+            elapsed += Time.deltaTime;
+            attackbarFill.fillAmount = elapsed / cooldown;
+            yield return null;
+        }
+
+        attackbarFill.fillAmount = 1;
+    }
+
     public void Refresh()
     {
         maxHealth = playerStats.maxHealth;
         currentHealth = playerStats.maxHealth;
+    }
+
+    public void ToggleBuildMenu(bool state)
+    {
+        ToggleBackground();
+        buildMenu.SetActive(state);
+        SpawnPanels(playerRef.GetAvailableBuildings());
+        
+    }
+
+    public void StartBuilding(BuildingData building)
+    {
+        playerRef.StartBuilding(building);
+    }
+
+    public void SpawnPanels(BuildingData[] buildingDataArray)
+    {
+        foreach (Transform child in buildMenu.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        float totalWidth = 600f; // width of menu area
+        float spacing = totalWidth / (buildingDataArray.Length);
+        float startX = -totalWidth / 2f + 110f;
+
+        for (int i = 0; i < buildingDataArray.Length; i++)
+        {
+            GameObject panel = Instantiate(buildingPanelPrefab, buildMenu.transform);
+            var rect = panel.GetComponent<RectTransform>();
+            rect.anchoredPosition = new Vector2(startX + spacing * (i + 1), 0);
+
+            var panelScript = panel.GetComponent<BuildingPanelScript>();
+            panelScript.data = buildingDataArray[i];
+        }
+    }
+
+    public void DisplayMessage(string message)
+    {
+        alertText.text = $"[Alert] {message}";
+        var fadeColor = new Color(alertText.color.r, alertText.color.g, alertText.color.b, 0f);
+        alertText.CrossFadeColor(fadeColor, 3f, true, true);
+        StartCoroutine(ResetAlert(3f));
+
+    }
+
+    private IEnumerator ResetAlert(float waitTime)
+    {
+        var elapsed = 0f;
+        while (elapsed < waitTime)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        alertText.text = "";
+        var fullColor = new Color(alertText.color.r, alertText.color.g, alertText.color.b, 1f);
+        alertText.CrossFadeColor(fullColor, 0f, true, true);
+
+    }
+
+    private void ToggleBackground()
+    {
+        background.enabled = !background.enabled;
+        var gameSpeed = background.enabled ? 0f : 1f;
+        StartCoroutine(UpdateGametime(gameSpeed));
+        overlay.SetActive(!overlay.activeSelf);
+
+    }
+
+    public void ShowOverlay()
+    {
+        overlay.SetActive(true);
+        buildButton.SetActive(true);
+        
+    }
+
+    public void HideOverlay()
+    {
+        buildButton.SetActive(false);
+        overlay.SetActive(false);
+    }
+    private IEnumerator UpdateGametime(float speed)
+    {
+        float targetTimeScale = speed;
+        float initialTimeScale = Time.timeScale;
+        float duration = 0.5f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            Time.timeScale = Mathf.Lerp(initialTimeScale, targetTimeScale, elapsed / duration);
+            yield return null;
+        }
+        Time.timeScale = targetTimeScale;
+    }
+
+    public void ShowDeathPanel(float duration)
+    {
+        deathPanel.SetActive(true);
+        overlay.SetActive(false);
+        buildButton.SetActive(false);
+        StartCoroutine(DeathPanelTimer(duration));
+    }
+
+    public TMP_Text respawnText;
+    private IEnumerator DeathPanelTimer(float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            if (elapsed % 1f < 0.1f)
+            {
+                respawnText.text = $"Respawning in {Mathf.CeilToInt(duration - elapsed)} seconds...";
+            }
+            yield return null;
+        }
+        HideDeathPanel();
+    }
+    public void HideDeathPanel()
+    {
+        deathPanel.SetActive(false);
+        overlay.SetActive(true);
+        buildButton.SetActive(true);
     }
 }

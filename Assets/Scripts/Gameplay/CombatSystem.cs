@@ -9,7 +9,8 @@ public class CombatSystem : MonoBehaviour
     public GameObject weaponRoot;
 
     private int physicalDmg, magicDmg;
-    private float attackRange = 4f, castTimer = 0f, cooldown = 1f;
+    private float attackRange = 3.5f, castTimer = 0f;
+    public float cooldown { get; private set; } = .6f;
     public bool attacking { get; private set; } = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -73,17 +74,24 @@ public class CombatSystem : MonoBehaviour
     private System.Collections.IEnumerator AnimateAttack()
     {
         // Simple attack animation: rotate the weapon root back and forth
-        float animationDuration = .3f; // Duration of the attack animation
+        float animationDuration = cooldown-.1f; // Duration of the attack animation
         float elapsedTime = 0f;
         Quaternion initialRotation = weaponRoot.transform.localRotation;
-        Quaternion targetRotation = initialRotation * Quaternion.Euler(45f, 0f, 0f);
+        Quaternion targetRotation = initialRotation * Quaternion.Euler(10f, 45f, 90f);
         while (elapsedTime < animationDuration)
         {
-            weaponRoot.transform.localRotation = Quaternion.Slerp(initialRotation, targetRotation, elapsedTime / animationDuration);
+            if (elapsedTime <= animationDuration / 2)
+            {
+                weaponRoot.transform.localRotation = Quaternion.Slerp(initialRotation, targetRotation, elapsedTime / animationDuration);
+            }
+            else
+            {
+                weaponRoot.transform.localRotation = Quaternion.Slerp(targetRotation, initialRotation, elapsedTime / animationDuration);
+            }
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-
+     
         // Reset rotation after attack
         weaponRoot.transform.localRotation = initialRotation;
         attacking = false;

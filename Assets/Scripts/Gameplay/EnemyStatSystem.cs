@@ -5,9 +5,9 @@ using UnityEngine;
 public class EnemyStatSystem : MonoBehaviour
 {
     [Header("Stat System Defaults")]
-    private float maxHealth = StatSystemSettings.defaultHealth;
-    private float maxEnergy = StatSystemSettings.defaultEnergy;
-    private int level = StatSystemSettings.defaultLevel, currentXp = StatSystemSettings.defaultXp;
+    private float maxHealth = EnemySettings.defaultHealth;
+    private float maxEnergy = EnemySettings.defaultEnergy;
+    private int level = EnemySettings.defaultLevel, currentXp = EnemySettings.defaultXp;
     private float currentEnergy, currentHealth;
     private int requiredXp;
 
@@ -15,7 +15,8 @@ public class EnemyStatSystem : MonoBehaviour
     [Header("Attributes")]
     [SerializeField] private int baseStrength = 5;
     [SerializeField] private int baseAgility = 4, baseIntelligence = 3, baseConstitution = 2;
-    [SerializeField] private int speedModifier = 1, jumpModifier = 1;
+    [SerializeField] private int jumpModifier = 1;
+    private float speed = EnemySettings.defaultSpeed, speedModifier = EnemySettings.defaultSpeedModifier;
 
     [Header("Combat")]
     [SerializeField] private EClasses currentClass = EClasses.Warrior;
@@ -75,7 +76,7 @@ public class EnemyStatSystem : MonoBehaviour
 
     private void UpdateMaxHealth()
     {
-        float newMaxHealth = (baseConstitution * level) * 1000;
+        float newMaxHealth = (baseConstitution * level) * 10;
         maxHealth = newMaxHealth;
     }
 
@@ -122,6 +123,8 @@ public class EnemyStatSystem : MonoBehaviour
     public int GetLevel() { return level; }
 
     public int GetMagicDamage() { return baseMagicDmg + (baseIntelligence * 2); }
+
+    public float GetSpeed() { return speed * speedModifier; }
     public void ClassUpdate(EClasses newClass)
     {
         // Hardcoded values, later could be in a datatable
@@ -191,4 +194,7 @@ public class EnemyStatSystem : MonoBehaviour
             }
         }
     }
+
+    public float GetCurrentHealth() { return currentHealth; }
+    public float GetMaxHealth() { return maxHealth; }
 }

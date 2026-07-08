@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc8e3331e52e7f8409f261fd39640a14, type: 3}
+  m_Name: WallData
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  buildingData:
+    buildingPrefab: {fileID: 4463952505901801015, guid: 477cbdb2472afd540bc61c9bc3cd4eaf, type: 3}
+    ghostPrefab: {fileID: 1388877350867071038, guid: b881c4fa8c7e2d44aa587413e048f077, type: 3}
+    buildingType: 1
+    buildingIcon: {fileID: 21300000, guid: c507c41e4d453594f90d0ef3685be43d, type: 3}
+    buildingName: Wall
+    buildingCost: 50
+    buildingHealth: 1500
+    buildingEnergy: 0
+    buildingLevel: 1
+    buildingXp: 0
+    baseDamage: 0
+    attackSpeed: 0
+    attackRange: 0

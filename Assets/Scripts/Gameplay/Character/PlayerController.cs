@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private StatSystem stats;
     private ResourceSystem resources;
     private GameObject targetTag;
+    private float regenTimer = 0f;
 
     // --- Private Variables ---
     // Movement and Look
@@ -39,12 +40,18 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private List<InputAction> actions = new();
     private InputAction sprintAction, moveAction, jumpAction;
     private InputAction lookAction;
-    private InputAction interactAction, attackAction;
+    private InputAction interactAction, attackAction, buildAction;
 
     private Transform respawnPoint;
     private HUDScript hud;
 
+    // Building variables
     public List<UpgradeObject> buildingUpgrades { get; private set; } = new();
+    public BuildingData[] buildings;
+    private List<BuildingData> activeBuildings = new();
+    private bool buildMode = false;
+    private GameObject ghostBuilding;
+    private BuildingData currentBuildingData;
 
     private void ConfigureSettings()
     {
@@ -56,12 +63,14 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         interactAction = InputSystem.actions.FindAction("interact");
         lookAction = InputSystem.actions.FindAction("look");
         attackAction = InputSystem.actions.FindAction("Attack");
+        buildAction = InputSystem.actions.FindAction("BuildKey");
         actions.Add(sprintAction);
         actions.Add(moveAction);
         actions.Add(jumpAction);
         actions.Add(interactAction);
         actions.Add(lookAction);
         actions.Add(attackAction);
+        actions.Add(buildAction);
         // Component References
         combat = GetComponent<CombatSystem>();
         stats = GetComponent<StatSystem>();
@@ -70,7 +79,9 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         stats.InitializeStats();
         playerEnabled = true;
         hud = GetComponentInChildren<HUDScript>();
-        
+        hud.StartHud();
+
+
     }
     void Start()
     {
@@ -89,6 +100,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     {
         if (playerEnabled)
         {
+            HandleRegen();
             HandleLook();
             HandleMovement();
 
@@ -109,21 +121,49 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
             {
                 if (combat.CanAttack())
                 {
-                    float damage = combat.Attack(EDamageType.physical);
-                    Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
-                    if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
-                    {
-                        GameObject objectHit = hit.transform.gameObject;
-                        if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
-                        {
-                            Debug.Log("Hitting " + objectHit.name + " for " + damage + " damage.");
-                            damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
-                        }
-                    }
+                    StartCoroutine(hud.AnimateAttackbar(combat.cooldown));
+                    Attack();
                 }
             }
 
-            
+            if (buildAction.WasPressedThisFrame())
+            {
+                if (!buildMode)
+                {
+                    buildMode = true;
+                    DisablePlayer();
+                    buildAction.Enable();
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                    hud.ToggleBuildMenu(true);
+
+                }
+                else
+                {
+                    EnablePlayer();
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                    buildMode = false;
+                    hud.ToggleBuildMenu(false);
+                }
+            }
+
+            if (ghostBuilding != null)
+            {
+                Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    ghostBuilding.transform.position = hit.point + (Vector3.down * 1.1f);
+                }
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    PlaceBuilding();
+                    buildMode = false;
+                }
+            }
+
+
         }
     }
 
@@ -186,6 +226,18 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         controller.Move(velocity * Time.deltaTime);
     }
 
+    private void HandleRegen()
+    {
+        if (regenTimer >= StatSystemSettings.regenerationDelay)
+        {
+            HealthRegen();
+        }
+        else
+        {
+            regenTimer += Time.deltaTime;
+        }
+    }
+
     private void Interact(GameObject interactObject)
     {
         Debug.Log("Hit " + interactObject.name);
@@ -193,6 +245,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void TakeDamage(GameObject attacker, float damage, EDamageType damageType)
     {
+        regenTimer = 0f;
         if (stats.Damage(damage))
         {
             KillSelf();
@@ -203,6 +256,22 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         if (target.TryGetComponent<IDamageableInterface>(out var component))
         {
             component.TakeDamage(this.gameObject, damage, damageType);
+        }
+    }
+
+    private void Attack()
+    {
+        float hitRadius = .25f;
+        float damage = combat.Attack(EDamageType.physical);
+        Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward.normalized);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange() + hitRadius))
+        {
+            GameObject objectHit = hit.transform.gameObject;
+            if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+            {
+                damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
+            }
         }
     }
 
@@ -247,13 +316,58 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         stats.AddUpgrade(upgrade);
     }
 
-    public void ApplyBuildingUpgrade(UpgradeObject upgrade)
+    public void AddBuildingUpgrade(UpgradeObject upgrade)
     {
         buildingUpgrades.Add(upgrade);
-        foreach (BuildingBehavior building in FindObjectsByType<BuildingBehavior>())
+        foreach (UpgradeStruct buildingUpgrade in upgrade.statUpgradesList)
         {
-            building.ApplyUpgrade(upgrade);
+            
+            foreach (BuildingData data in activeBuildings)
+            {
+                switch (buildingUpgrade.upgradeType)
+                {
+                    case EUpgradeType.buildingHealth:
+                        data.buildingData.buildingHealth += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingDamage:
+                        data.buildingData.baseDamage += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingAttackSpeed:
+                        data.buildingData.attackSpeed += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingRange:
+                        data.buildingData.attackRange += buildingUpgrade.upgradeValue;
+                        break;
+                }
+            }
         }
+
+    }
+
+    private BuildingData ApplyBuildingUpgrades(BuildingData newBuilding)
+    {
+        foreach (UpgradeObject upgrade in buildingUpgrades)
+        {
+            foreach (UpgradeStruct buildingUpgrade in upgrade.statUpgradesList)
+            {
+                switch (buildingUpgrade.upgradeType)
+                {
+                    case EUpgradeType.buildingHealth:
+                        newBuilding.buildingData.buildingHealth += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingDamage:
+                        newBuilding.buildingData.baseDamage += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingAttackSpeed:
+                        newBuilding.buildingData.attackSpeed += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingRange:
+                        newBuilding.buildingData.attackRange += buildingUpgrade.upgradeValue;
+                        break;
+                }
+            }
+        }
+        return newBuilding;
     }
 
     private void KillSelf()
@@ -270,6 +384,8 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private float respawnGracePeriod = 3f;
     private IEnumerator RespawnTimer(float respawnTime)
     {
+        hud.ShowDeathPanel(4f);
+
         Debug.Log("Player respawning in " + respawnTime + " seconds.");
         StartCoroutine(GracePeriod(respawnTime + respawnGracePeriod));
         yield return new WaitForSeconds(respawnTime);
@@ -278,6 +394,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void Respawn()
     {
+        hud.HideDeathPanel();
         Debug.Log("Player has respawned.");
         gameObject.transform.position = respawnPoint.position;
         gameObject.transform.rotation = respawnPoint.rotation;
@@ -286,6 +403,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
             action.Enable();
         }
         stats.Respawn();
+        hud.Refresh();
         
     }
 
@@ -299,4 +417,43 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     }
 
     public float GetHealth() { return stats.currentHealth; }
+
+    public BuildingData[] GetAvailableBuildings()
+    {
+        return buildings;
+    }
+
+    public void HideHud() { hud.HideOverlay(); }
+    public void ShowHud() { hud.ShowOverlay(); }
+
+    public void StartBuilding(BuildingData building)
+    {
+        currentBuildingData = ApplyBuildingUpgrades(building);
+        ghostBuilding = Instantiate(building.buildingData.ghostPrefab);
+        foreach (var col in ghostBuilding.GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
+        }
+        EnablePlayer();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        hud.ToggleBuildMenu(false);
+    }
+
+    private void PlaceBuilding()
+    {
+        if (ghostBuilding != null)
+        {
+            activeBuildings.Add(currentBuildingData);
+            Instantiate(currentBuildingData.buildingData.buildingPrefab, ghostBuilding.transform.position, ghostBuilding.transform.rotation);
+            Destroy(ghostBuilding);
+            ghostBuilding = null;
+            buildMode = false;
+        }
+    }
+
+    private void HealthRegen()
+    {
+        stats.Damage(StatSystemSettings.regenerationRate * Time.deltaTime * -1);
+    }
 }

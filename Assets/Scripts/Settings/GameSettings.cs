@@ -19,4 +19,13 @@ public static class StatSystemSettings
 {
     public static float defaultHealth = 1000, defaultEnergy = 100;
     public static int defaultLevel = 1, defaultXp = 0;
+    public static float regenerationRate = 25f, regenerationDelay = 3f;
+}
+
+[System.Serializable]
+public static class EnemySettings
+{
+    public static float defaultHealth = 100, defaultEnergy = 100;
+    public static int defaultLevel = 1, defaultXp = 0;
+    public static float defaultAttackRange = 2f, defaultAttackDamage = 5f, defaultSpeed = 3f, defaultSpeedModifier = 1f;
 }

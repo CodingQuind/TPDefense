@@ -10,19 +10,20 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     [SerializeField] private Animator animSystem;
     private EnemyStatSystem stats;
     private GameObject currentTarget;
-    private Collider targetCollider;
 
     private GameObject playerRef;
     private NavMeshAgent navAgent;
     public List<Checkpoint> checkpoints;
     private int checkpointIndex;
-    private float attackTimer = 0f, attackInterval = 1f;
+    private float attackTimer = 0f, attackInterval = 2f;
 
     public enum AIState { Patrol, Chase, Attack, Dying, Defending }
     public AIState state = AIState.Patrol;
 
     public float detectionRange = 10f;
     public float attackRange = 1f;
+
+    private HealthBar healthBar;
 
     public void DamageTarget(GameObject target, float damage, EDamageType damageType)
     {
@@ -43,11 +44,21 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         playerRef = GameObject.FindGameObjectWithTag("Player");
         stats = gameObject.GetComponent<EnemyStatSystem>();
         navAgent = gameObject.GetComponent<NavMeshAgent>();
+        stats.InitializeStats();
+        navAgent.speed = stats.GetSpeed();
+        healthBar = gameObject.GetComponentInChildren<HealthBar>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Vector3.Distance(Camera.main.transform.position, transform.position) > 100f)
+            healthBar.enabled = false;
+        else
+        {
+            healthBar.enabled = true;
+            healthBar.SetHealth(stats.GetCurrentHealth(), stats.GetMaxHealth());
+        }
         attackTimer += Time.deltaTime;
         GameObject newTarget = GetClosestEnemy();
         if (newTarget != null)
@@ -57,7 +68,6 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         else
         {
             currentTarget = null;
-            targetCollider = null;
         }
 
         switch (state)
@@ -79,7 +89,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
                     break;
                 }
 
-                float dist = Vector3.Distance(transform.position, targetCollider.ClosestPoint(transform.position));
+                float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
 
                 if (dist > detectionRange)
                 {
@@ -102,7 +112,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
                     break;
                 }
 
-                float attackDist = Vector3.Distance(transform.position, targetCollider.ClosestPoint(transform.position));
+                float attackDist = Vector3.Distance(transform.position, currentTarget.transform.position);
 
                 if (attackDist > attackRange)
                 {
@@ -126,23 +136,15 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
 
         foreach (var e in enemies)
         {
-            // Find the collider anywhere in the hierarchy
-            Collider col = e.GetComponentInParent<Collider>();
-            if (col == null)
-                continue; // skip objects without colliders
-
-            // Closest point on the collider surface
-            Vector3 closestPoint = col.ClosestPoint(transform.position);
-
-            float dist = Vector3.Distance(transform.position, closestPoint);
+            var eTransform = e.transform.parent.transform;
+            float dist = Vector3.Distance(transform.position, eTransform.transform.position);
 
             if (dist < minDist && e.activeSelf == true)
             {
                 minDist = dist;
-                closest = col.gameObject; // return the object that actually has the collider
+                closest = e.transform.parent.gameObject;
             }
         }
-
         return closest;
     }
 
@@ -165,6 +167,10 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
 
     void Attack(GameObject target)
     {
+        Vector3 direction = target.transform.position - transform.position;
+        direction.y = 0f;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         navAgent.isStopped = true;
         var hit = target.GetComponent<IDamageableInterface>();
         if (attackTimer >= attackInterval && target.activeSelf == true)
@@ -184,13 +190,6 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     void SetTarget(GameObject t)
     {
         currentTarget = t;
-
-        // Find the collider anywhere above this object
-        targetCollider = t.GetComponentInParent<Collider>();
-
-        // Optional safety check
-        if (targetCollider == null)
-            Debug.LogWarning($"No collider found for target {t.name}");
     }
 
     public void SetCheckpoints(Checkpoint[] checkpoints)
@@ -207,6 +206,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         animSystem.SetTrigger("dead");
         navAgent.enabled = false;
         state = AIState.Dying;
+        gameObject.tag = "Untagged";
 
         Destroy(gameObject, 3f);
     }
