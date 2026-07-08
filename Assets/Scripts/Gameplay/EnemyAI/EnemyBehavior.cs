@@ -18,7 +18,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     private int checkpointIndex;
     private float attackTimer = 0f, attackInterval = 1f;
 
-    public enum AIState { Patrol, Chase, Attack, Dying }
+    public enum AIState { Patrol, Chase, Attack, Dying, Defending }
     public AIState state = AIState.Patrol;
 
     public float detectionRange = 10f;
@@ -116,22 +116,6 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
             case AIState.Dying:
                 break;
         }
-        //float distance = Vector3.Distance(gameObject.transform.position + (Vector3.up * 2), FindMoveTarget());
-        //if (distance > stopDistance)
-        //{
-        //    Move(gameObject.transform.position + (Vector3.up * 2), FindMoveTarget());
-        //} else
-        //{
-        //    navAgent.isStopped = true;
-        //}
-    }
-
-
-    private void Move(Vector3 source, Vector3 dest)
-    {
-        navAgent.isStopped = false;
-        transform.LookAt(dest);
-        navAgent.destination = dest;
     }
 
     private GameObject GetClosestEnemy()
@@ -182,11 +166,6 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     void Attack(GameObject target)
     {
         navAgent.isStopped = true;
-
-        // Face the target
-        Vector3 dir = (target.transform.position - transform.position).normalized;
-        transform.rotation = Quaternion.LookRotation(dir);
-        // Trigger your animation
         var hit = target.GetComponent<IDamageableInterface>();
         if (attackTimer >= attackInterval && target.activeSelf == true)
         {

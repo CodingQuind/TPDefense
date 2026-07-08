@@ -16,8 +16,10 @@ public struct BuildingDataStruct
     public int buildingLevel;
     public int buildingXp;
     public int baseDamage;
+    public float attackSpeed;
+    public float attackRange;
 
-    public BuildingDataStruct(string name, int cost, float health, float energy, int level, int xp, int baseDamage)
+    public BuildingDataStruct(string name, int cost, float health, float energy, int level, int xp, int baseDamage, float attackSpeed, float attackRange)
     {
         buildingName = name;
         buildingCost = cost;
@@ -26,5 +28,7 @@ public struct BuildingDataStruct
         buildingLevel = level;
         buildingXp = xp;
         this.baseDamage = baseDamage;
+        this.attackSpeed = attackSpeed;
+        this.attackRange = attackRange;
     }
 }

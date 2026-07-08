@@ -1,10 +1,19 @@
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
+using static EnemyBehavior;
 
 public class BuildingBehavior : MonoBehaviour, IDamageableInterface
 {
     public BuildingData data;
     private BuildingDataStruct buildingData;
     private float currentHealth;
+    private float attackTimer = 0f;
+
+    private GameObject[] enemies;
+    private GameObject currentTarget;
+    private Transform projSpawnLoc;
+    private Collider targetCollider;
+    private AIState state = AIState.Defending;
 
     public void DamageTarget(GameObject target, float damage, EDamageType damageType)
     {
@@ -26,18 +35,119 @@ public class BuildingBehavior : MonoBehaviour, IDamageableInterface
         player.SpendMoney((int)(-buildingData.buildingCost *.25));
         Destroy(gameObject);
     }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         buildingData = data.buildingData;
         currentHealth = buildingData.buildingHealth;
+        projSpawnLoc = transform.Find("ProjectileLaunchpoint").gameObject.transform;
     }
-
-    // Update is called once per frame
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Update()
     {
-        
+        attackTimer += Time.deltaTime;
+        GameObject newTarget = GetClosestEnemy();
+        if (newTarget != null)
+        {
+            SetTarget(newTarget);
+        }
+        else
+        {
+            currentTarget = null;
+            targetCollider = null;
+        }
+
+        if (currentTarget != null)
+        {
+            float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
+
+            if (dist <= buildingData.attackRange)
+            {
+                state = AIState.Attack;
+            }
+        }
+
+        switch (state)
+        {
+
+            case AIState.Attack:
+                if (currentTarget == null)
+                {
+                    state = AIState.Defending;
+                    break;
+                }
+
+                float attackDist = Vector3.Distance(transform.position, targetCollider.ClosestPoint(transform.position));
+
+                if (attackDist > buildingData.attackRange)
+                {
+                    state = AIState.Defending;
+                }
+                else
+                {
+                    Attack(currentTarget);
+                }
+                break;
+            case AIState.Dying:
+                break;
+            case AIState.Defending:
+                break;
+        }
+    }
+
+    private GameObject GetClosestEnemy()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        GameObject closest = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (var e in enemies)
+        {
+            // Find the collider anywhere in the hierarchy
+            Collider col = e.GetComponent<Collider>();
+            if (col == null)
+                continue; // skip objects without colliders
+
+            // Closest point on the collider surface
+            Vector3 closestPoint = col.ClosestPoint(transform.position);
+
+            float dist = Vector3.Distance(transform.position, closestPoint);
+
+            if (dist < minDist && dist < buildingData.attackRange)
+            {
+                minDist = dist;
+                closest = col.gameObject; // return the object that actually has the collider
+            }
+        }
+
+        return closest;
+    }
+
+    void Attack(GameObject target)
+    {
+        var hit = target.GetComponent<IDamageableInterface>();
+        if (attackTimer >= buildingData.attackSpeed && target.activeSelf == true)
+        {
+            if (hit != null)
+            {
+                hit.TakeDamage(this.gameObject, buildingData.baseDamage, EDamageType.physical);
+                Debug.Log("[BuildingBehavior] DEBUG: hitting target for " + buildingData.baseDamage + " damage.");
+                attackTimer = 0f;
+            }
+        }
+
+    }
+
+
+    void SetTarget(GameObject t)
+    {
+        currentTarget = t;
+
+        // Find the collider anywhere above this object
+        targetCollider = t.GetComponent<Collider>();
+
+        // Optional safety check
+        if (targetCollider == null)
+            Debug.LogWarning($"No collider found for target {t.name}");
     }
 
     public void ApplyUpgrade(UpgradeObject upgrade)
