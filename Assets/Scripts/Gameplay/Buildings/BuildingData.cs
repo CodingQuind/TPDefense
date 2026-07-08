@@ -15,8 +15,9 @@ public struct BuildingDataStruct
     public float buildingEnergy;
     public int buildingLevel;
     public int buildingXp;
+    public int baseDamage;
 
-    public BuildingDataStruct(string name, int cost, float health, float energy, int level, int xp)
+    public BuildingDataStruct(string name, int cost, float health, float energy, int level, int xp, int baseDamage)
     {
         buildingName = name;
         buildingCost = cost;
@@ -24,5 +25,6 @@ public struct BuildingDataStruct
         buildingEnergy = energy;
         buildingLevel = level;
         buildingXp = xp;
+        this.baseDamage = baseDamage;
     }
 }

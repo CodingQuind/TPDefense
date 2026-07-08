@@ -43,6 +43,8 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     private Transform respawnPoint;
 
+    public List<UpgradeObject> buildingUpgrades { get; private set; } = new();
+
     private void ConfigureSettings()
     {
 
@@ -241,6 +243,15 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     public void ApplyStatUpgrade(UpgradeObject upgrade)
     {
         stats.AddUpgrade(upgrade);
+    }
+
+    public void ApplyBuildingUpgrade(UpgradeObject upgrade)
+    {
+        buildingUpgrades.Add(upgrade);
+        foreach (BuildingBehavior building in FindObjectsByType<BuildingBehavior>())
+        {
+            building.ApplyUpgrade(upgrade);
+        }
     }
 
     private void KillSelf()

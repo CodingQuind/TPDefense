@@ -9,6 +9,12 @@ public enum EUpgradeType
    speed = 4,
    jumpHeight = 5,
    moneyGen = 6,
-   spellCooldown = 7
+   spellCooldown = 7,
+   buildingHealth = 8,
+   buildingDamage = 9,
+   buildingAttackSpeed = 10,
+   buildingRange = 11,
+   buildingCostReduction = 12,
+   buildingResourceGeneration = 13,
 
 }
