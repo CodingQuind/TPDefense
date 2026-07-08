@@ -39,4 +39,6 @@ public struct BuildingDataStruct
         this.attackSpeed = attackSpeed;
         this.attackRange = attackRange;
     }
+
+
 }

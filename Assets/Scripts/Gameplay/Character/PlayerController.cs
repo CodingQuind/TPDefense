@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     // Building variables
     public List<UpgradeObject> buildingUpgrades { get; private set; } = new();
     public BuildingData[] buildings;
+    private List<BuildingData> activeBuildings = new();
     private bool buildMode = false;
     private GameObject ghostBuilding;
     private BuildingData currentBuildingData;
@@ -315,13 +316,58 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         stats.AddUpgrade(upgrade);
     }
 
-    public void ApplyBuildingUpgrade(UpgradeObject upgrade)
+    public void AddBuildingUpgrade(UpgradeObject upgrade)
     {
         buildingUpgrades.Add(upgrade);
-        foreach (BuildingBehavior building in FindObjectsByType<BuildingBehavior>())
+        foreach (UpgradeStruct buildingUpgrade in upgrade.statUpgradesList)
         {
-            building.ApplyUpgrade(upgrade);
+            
+            foreach (BuildingData data in activeBuildings)
+            {
+                switch (buildingUpgrade.upgradeType)
+                {
+                    case EUpgradeType.buildingHealth:
+                        data.buildingData.buildingHealth += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingDamage:
+                        data.buildingData.baseDamage += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingAttackSpeed:
+                        data.buildingData.attackSpeed += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingRange:
+                        data.buildingData.attackRange += buildingUpgrade.upgradeValue;
+                        break;
+                }
+            }
         }
+
+    }
+
+    private BuildingData ApplyBuildingUpgrades(BuildingData newBuilding)
+    {
+        foreach (UpgradeObject upgrade in buildingUpgrades)
+        {
+            foreach (UpgradeStruct buildingUpgrade in upgrade.statUpgradesList)
+            {
+                switch (buildingUpgrade.upgradeType)
+                {
+                    case EUpgradeType.buildingHealth:
+                        newBuilding.buildingData.buildingHealth += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingDamage:
+                        newBuilding.buildingData.baseDamage += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingAttackSpeed:
+                        newBuilding.buildingData.attackSpeed += buildingUpgrade.upgradeValue;
+                        break;
+                    case EUpgradeType.buildingRange:
+                        newBuilding.buildingData.attackRange += buildingUpgrade.upgradeValue;
+                        break;
+                }
+            }
+        }
+        return newBuilding;
     }
 
     private void KillSelf()
@@ -338,6 +384,8 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private float respawnGracePeriod = 3f;
     private IEnumerator RespawnTimer(float respawnTime)
     {
+        hud.ShowDeathPanel(4f);
+
         Debug.Log("Player respawning in " + respawnTime + " seconds.");
         StartCoroutine(GracePeriod(respawnTime + respawnGracePeriod));
         yield return new WaitForSeconds(respawnTime);
@@ -346,6 +394,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void Respawn()
     {
+        hud.HideDeathPanel();
         Debug.Log("Player has respawned.");
         gameObject.transform.position = respawnPoint.position;
         gameObject.transform.rotation = respawnPoint.rotation;
@@ -374,9 +423,12 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         return buildings;
     }
 
+    public void HideHud() { hud.HideOverlay(); }
+    public void ShowHud() { hud.ShowOverlay(); }
+
     public void StartBuilding(BuildingData building)
     {
-        currentBuildingData = building;
+        currentBuildingData = ApplyBuildingUpgrades(building);
         ghostBuilding = Instantiate(building.buildingData.ghostPrefab);
         foreach (var col in ghostBuilding.GetComponentsInChildren<Collider>())
         {
@@ -392,6 +444,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     {
         if (ghostBuilding != null)
         {
+            activeBuildings.Add(currentBuildingData);
             Instantiate(currentBuildingData.buildingData.buildingPrefab, ghostBuilding.transform.position, ghostBuilding.transform.rotation);
             Destroy(ghostBuilding);
             ghostBuilding = null;

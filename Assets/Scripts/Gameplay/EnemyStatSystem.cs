@@ -194,4 +194,7 @@ public class EnemyStatSystem : MonoBehaviour
             }
         }
     }
+
+    public float GetCurrentHealth() { return currentHealth; }
+    public float GetMaxHealth() { return maxHealth; }
 }

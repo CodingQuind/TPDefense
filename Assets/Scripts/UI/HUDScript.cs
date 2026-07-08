@@ -14,8 +14,10 @@ public class HUDScript : MonoBehaviour
     private PlayerController playerRef;
     private StatSystem playerStats;
     private GameObject overlay;
+    private GameObject deathPanel;
 
     private TMP_Text alertText;
+    private GameObject buildButton;
     private float currentHealth, maxHealth;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -32,6 +34,9 @@ public class HUDScript : MonoBehaviour
         GetComponent<Canvas>().enabled = false;
         overlay = GameObject.Find("Overlay");
         overlay.SetActive(false);
+        buildButton = GameObject.Find("BuildButton");
+        deathPanel = GameObject.Find("DeathPanel");
+        deathPanel.SetActive(false);
     }
 
     public void StartHud()
@@ -154,6 +159,18 @@ public class HUDScript : MonoBehaviour
 
     }
 
+    public void ShowOverlay()
+    {
+        overlay.SetActive(true);
+        buildButton.SetActive(true);
+        
+    }
+
+    public void HideOverlay()
+    {
+        buildButton.SetActive(false);
+        overlay.SetActive(false);
+    }
     private IEnumerator UpdateGametime(float speed)
     {
         float targetTimeScale = speed;
@@ -167,5 +184,35 @@ public class HUDScript : MonoBehaviour
             yield return null;
         }
         Time.timeScale = targetTimeScale;
+    }
+
+    public void ShowDeathPanel(float duration)
+    {
+        deathPanel.SetActive(true);
+        overlay.SetActive(false);
+        buildButton.SetActive(false);
+        StartCoroutine(DeathPanelTimer(duration));
+    }
+
+    public TMP_Text respawnText;
+    private IEnumerator DeathPanelTimer(float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            if (elapsed % 1f < 0.1f)
+            {
+                respawnText.text = $"Respawning in {Mathf.CeilToInt(duration - elapsed)} seconds...";
+            }
+            yield return null;
+        }
+        HideDeathPanel();
+    }
+    public void HideDeathPanel()
+    {
+        deathPanel.SetActive(false);
+        overlay.SetActive(true);
+        buildButton.SetActive(true);
     }
 }

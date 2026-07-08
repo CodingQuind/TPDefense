@@ -23,6 +23,8 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     public float detectionRange = 10f;
     public float attackRange = 1f;
 
+    private HealthBar healthBar;
+
     public void DamageTarget(GameObject target, float damage, EDamageType damageType)
     {
         throw new System.NotImplementedException();
@@ -44,11 +46,19 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         navAgent = gameObject.GetComponent<NavMeshAgent>();
         stats.InitializeStats();
         navAgent.speed = stats.GetSpeed();
+        healthBar = gameObject.GetComponentInChildren<HealthBar>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Vector3.Distance(Camera.main.transform.position, transform.position) > 100f)
+            healthBar.enabled = false;
+        else
+        {
+            healthBar.enabled = true;
+            healthBar.SetHealth(stats.GetCurrentHealth(), stats.GetMaxHealth());
+        }
         attackTimer += Time.deltaTime;
         GameObject newTarget = GetClosestEnemy();
         if (newTarget != null)
@@ -157,6 +167,10 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
 
     void Attack(GameObject target)
     {
+        Vector3 direction = target.transform.position - transform.position;
+        direction.y = 0f;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         navAgent.isStopped = true;
         var hit = target.GetComponent<IDamageableInterface>();
         if (attackTimer >= attackInterval && target.activeSelf == true)

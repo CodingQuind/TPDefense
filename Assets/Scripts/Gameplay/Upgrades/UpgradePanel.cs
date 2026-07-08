@@ -21,15 +21,6 @@ public class UpgradePanel : MonoBehaviour
         upgradeButton.onClick.AddListener(() => scriptRef.CommitUpgrade(upgrade, this));
     }
 
-    public void SetUpgrade(UpgradeObject upgrade, BuildingUpgradeScript scriptRef)
-    {
-        this.upgrade = upgrade;
-        upgradeIcon.sprite = upgrade.icon;
-        upgradeNameText.text = upgrade.upgradeName;
-        upgradeCostText.text = upgrade.cost.ToString() + "g";
-        upgradeButton.onClick.AddListener(() => scriptRef.CommitUpgrade(upgrade, this));
-    }
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
