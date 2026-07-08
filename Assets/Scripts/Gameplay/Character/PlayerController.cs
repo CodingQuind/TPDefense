@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private InputAction interactAction, attackAction;
 
     private Transform respawnPoint;
+    private HUDScript hud;
 
     public List<UpgradeObject> buildingUpgrades { get; private set; } = new();
 
@@ -68,6 +69,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         targetTag = GameObject.Find("enemyTargetTagPlayer");
         stats.InitializeStats();
         playerEnabled = true;
+        hud = GetComponentInChildren<HUDScript>();
         
     }
     void Start()
@@ -283,6 +285,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         {
             action.Enable();
         }
+        stats.Respawn();
         
     }
 
@@ -294,4 +297,6 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         targetTag.SetActive(true);
         Debug.Log("Grace period ended.");
     }
+
+    public float GetHealth() { return stats.currentHealth; }
 }

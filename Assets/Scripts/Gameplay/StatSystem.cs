@@ -5,10 +5,11 @@ using UnityEngine;
 public class StatSystem : MonoBehaviour
 {
     [Header("Stat System Defaults")]
-    private float maxHealth = StatSystemSettings.defaultHealth;
+    public float maxHealth { get; private set; } = StatSystemSettings.defaultHealth;
     private float maxEnergy = StatSystemSettings.defaultEnergy;
     private int level = StatSystemSettings.defaultLevel, currentXp = StatSystemSettings.defaultXp;
-    private float currentEnergy, currentHealth;
+    public float currentEnergy { get; private set; }
+    public float currentHealth { get; private set; }
     private int requiredXp;
 
     // NOTE: Base attributes will be removed and be based on class instead. This is just a temporary solution to get the system working.
@@ -189,4 +190,14 @@ public class StatSystem : MonoBehaviour
             }
         }
     }
+
+    public void Respawn()
+    {
+        currentHealth = maxHealth;
+        currentEnergy = maxEnergy;
+        level = 1;
+        currentXp = 0;
+        CalculateRequiredXp(1);
+    }
+
 }
