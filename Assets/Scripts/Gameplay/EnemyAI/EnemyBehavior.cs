@@ -42,6 +42,8 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         playerRef = GameObject.FindGameObjectWithTag("Player");
         stats = gameObject.GetComponent<EnemyStatSystem>();
         navAgent = gameObject.GetComponent<NavMeshAgent>();
+        stats.InitializeStats();
+        navAgent.speed = stats.GetSpeed();
     }
 
     // Update is called once per frame
@@ -190,6 +192,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         animSystem.SetTrigger("dead");
         navAgent.enabled = false;
         state = AIState.Dying;
+        gameObject.tag = "Untagged";
 
         Destroy(gameObject, 3f);
     }

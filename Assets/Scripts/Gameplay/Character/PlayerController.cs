@@ -39,12 +39,17 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private List<InputAction> actions = new();
     private InputAction sprintAction, moveAction, jumpAction;
     private InputAction lookAction;
-    private InputAction interactAction, attackAction;
+    private InputAction interactAction, attackAction, buildAction;
 
     private Transform respawnPoint;
     private HUDScript hud;
 
+    // Building variables
     public List<UpgradeObject> buildingUpgrades { get; private set; } = new();
+    public BuildingData[] buildings;
+    private bool buildMode = false;
+    private GameObject ghostBuilding;
+    private BuildingData currentBuildingData;
 
     private void ConfigureSettings()
     {
@@ -56,12 +61,14 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         interactAction = InputSystem.actions.FindAction("interact");
         lookAction = InputSystem.actions.FindAction("look");
         attackAction = InputSystem.actions.FindAction("Attack");
+        buildAction = InputSystem.actions.FindAction("BuildKey");
         actions.Add(sprintAction);
         actions.Add(moveAction);
         actions.Add(jumpAction);
         actions.Add(interactAction);
         actions.Add(lookAction);
         actions.Add(attackAction);
+        actions.Add(buildAction);
         // Component References
         combat = GetComponent<CombatSystem>();
         stats = GetComponent<StatSystem>();
@@ -70,7 +77,9 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         stats.InitializeStats();
         playerEnabled = true;
         hud = GetComponentInChildren<HUDScript>();
-        
+        hud.StartHud();
+
+
     }
     void Start()
     {
@@ -109,21 +118,49 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
             {
                 if (combat.CanAttack())
                 {
-                    float damage = combat.Attack(EDamageType.physical);
-                    Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
-                    if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange()))
-                    {
-                        GameObject objectHit = hit.transform.gameObject;
-                        if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
-                        {
-                            Debug.Log("Hitting " + objectHit.name + " for " + damage + " damage.");
-                            damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
-                        }
-                    }
+                    StartCoroutine(hud.AnimateAttackbar(combat.cooldown));
+                    Attack();
                 }
             }
 
-            
+            if (buildAction.WasPressedThisFrame())
+            {
+                if (!buildMode)
+                {
+                    buildMode = true;
+                    DisablePlayer();
+                    buildAction.Enable();
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                    hud.ToggleBuildMenu(true);
+
+                }
+                else
+                {
+                    EnablePlayer();
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                    buildMode = false;
+                    hud.ToggleBuildMenu(false);
+                }
+            }
+
+            if (ghostBuilding != null)
+            {
+                Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    ghostBuilding.transform.position = hit.point + (Vector3.down * 1.1f);
+                }
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    PlaceBuilding();
+                    buildMode = false;
+                }
+            }
+
+
         }
     }
 
@@ -203,6 +240,22 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         if (target.TryGetComponent<IDamageableInterface>(out var component))
         {
             component.TakeDamage(this.gameObject, damage, damageType);
+        }
+    }
+
+    private void Attack()
+    {
+        float hitRadius = .25f;
+        float damage = combat.Attack(EDamageType.physical);
+        Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward.normalized);
+
+        if (Physics.SphereCast(ray, hitRadius, out RaycastHit hit, combat.GetAttackRange() + hitRadius))
+        {
+            GameObject objectHit = hit.transform.gameObject;
+            if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
+            {
+                damageable.TakeDamage(this.gameObject, damage, EDamageType.physical);
+            }
         }
     }
 
@@ -286,6 +339,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
             action.Enable();
         }
         stats.Respawn();
+        hud.Refresh();
         
     }
 
@@ -299,4 +353,37 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     }
 
     public float GetHealth() { return stats.currentHealth; }
+
+    public BuildingData[] GetAvailableBuildings()
+    {
+        return buildings;
+    }
+
+    public void StartBuilding(BuildingData building)
+    {
+        currentBuildingData = building;
+        ghostBuilding = Instantiate(building.buildingData.buildingPrefab);
+        foreach (var renderer in ghostBuilding.GetComponentsInChildren<Renderer>())
+        {
+            renderer.material.color = new Color(1f, 1f, 1f, 0.5f);
+        }
+        foreach (var col in ghostBuilding.GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
+        }
+        EnablePlayer();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        hud.ToggleBuildMenu(false);
+    }
+
+    private void PlaceBuilding()
+    {
+        if (ghostBuilding != null)
+        {
+            Instantiate(currentBuildingData.buildingData.buildingPrefab, ghostBuilding.transform.position, ghostBuilding.transform.rotation);
+            ghostBuilding = null;
+            buildMode = false;
+        }
+    }
 }

@@ -76,7 +76,7 @@ public class BuildingBehavior : MonoBehaviour, IDamageableInterface
                     break;
                 }
 
-                float attackDist = Vector3.Distance(transform.position, targetCollider.ClosestPoint(transform.position));
+                float attackDist = Vector3.Distance(transform.position, currentTarget.transform.position);
 
                 if (attackDist > buildingData.attackRange)
                 {
@@ -102,30 +102,21 @@ public class BuildingBehavior : MonoBehaviour, IDamageableInterface
 
         foreach (var e in enemies)
         {
-            // Find the collider anywhere in the hierarchy
-            Collider col = e.GetComponent<Collider>();
-            if (col == null)
-                continue; // skip objects without colliders
-
-            // Closest point on the collider surface
-            Vector3 closestPoint = col.ClosestPoint(transform.position);
-
-            float dist = Vector3.Distance(transform.position, closestPoint);
+            float dist = Vector3.Distance(transform.position, e.transform.position);
 
             if (dist < minDist && dist < buildingData.attackRange)
             {
                 minDist = dist;
-                closest = col.gameObject; // return the object that actually has the collider
+                closest = e;
             }
         }
-
         return closest;
     }
 
     void Attack(GameObject target)
     {
         var hit = target.GetComponent<IDamageableInterface>();
-        if (attackTimer >= buildingData.attackSpeed && target.activeSelf == true)
+        if (attackTimer >= buildingData.attackSpeed)
         {
             if (hit != null)
             {

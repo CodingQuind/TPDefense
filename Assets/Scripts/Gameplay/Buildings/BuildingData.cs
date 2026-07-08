@@ -9,6 +9,8 @@ public class BuildingData : ScriptableObject
 [System.Serializable]
 public struct BuildingDataStruct
 {
+    public GameObject buildingPrefab;
+    public Sprite buildingIcon;
     public string buildingName;
     public int buildingCost;
     public float buildingHealth;
@@ -19,8 +21,10 @@ public struct BuildingDataStruct
     public float attackSpeed;
     public float attackRange;
 
-    public BuildingDataStruct(string name, int cost, float health, float energy, int level, int xp, int baseDamage, float attackSpeed, float attackRange)
+    public BuildingDataStruct(GameObject model, Sprite icon, string name, int cost, float health, float energy, int level, int xp, int baseDamage, float attackSpeed, float attackRange)
     {
+        buildingPrefab = model;
+        buildingIcon = icon;
         buildingName = name;
         buildingCost = cost;
         buildingHealth = health;
