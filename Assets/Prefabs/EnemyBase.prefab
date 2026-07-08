@@ -239,8 +239,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   state: 0
-  detectionRange: 10
-  attackRange: 4
+  detectionRange: 15
+  attackRange: 3
 --- !u!114 &293807703741921707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,7 +256,7 @@ MonoBehaviour:
   baseStrength: 4
   baseAgility: 5
   baseIntelligence: 1
-  baseConstitution: 2
+  baseConstitution: 4
   speedModifier: 1
   jumpModifier: 1
   currentClass: 1

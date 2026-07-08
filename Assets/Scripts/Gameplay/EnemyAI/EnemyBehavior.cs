@@ -10,13 +10,12 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     [SerializeField] private Animator animSystem;
     private EnemyStatSystem stats;
     private GameObject currentTarget;
-    private Collider targetCollider;
 
     private GameObject playerRef;
     private NavMeshAgent navAgent;
     public List<Checkpoint> checkpoints;
     private int checkpointIndex;
-    private float attackTimer = 0f, attackInterval = 1f;
+    private float attackTimer = 0f, attackInterval = 2f;
 
     public enum AIState { Patrol, Chase, Attack, Dying, Defending }
     public AIState state = AIState.Patrol;
@@ -57,7 +56,6 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
         else
         {
             currentTarget = null;
-            targetCollider = null;
         }
 
         switch (state)
@@ -79,7 +77,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
                     break;
                 }
 
-                float dist = Vector3.Distance(transform.position, targetCollider.ClosestPoint(transform.position));
+                float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
 
                 if (dist > detectionRange)
                 {
@@ -102,7 +100,7 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
                     break;
                 }
 
-                float attackDist = Vector3.Distance(transform.position, targetCollider.ClosestPoint(transform.position));
+                float attackDist = Vector3.Distance(transform.position, currentTarget.transform.position);
 
                 if (attackDist > attackRange)
                 {
@@ -126,23 +124,15 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
 
         foreach (var e in enemies)
         {
-            // Find the collider anywhere in the hierarchy
-            Collider col = e.GetComponentInParent<Collider>();
-            if (col == null)
-                continue; // skip objects without colliders
-
-            // Closest point on the collider surface
-            Vector3 closestPoint = col.ClosestPoint(transform.position);
-
-            float dist = Vector3.Distance(transform.position, closestPoint);
+            var eTransform = e.transform.parent.transform;
+            float dist = Vector3.Distance(transform.position, eTransform.transform.position);
 
             if (dist < minDist && e.activeSelf == true)
             {
                 minDist = dist;
-                closest = col.gameObject; // return the object that actually has the collider
+                closest = e.transform.parent.gameObject;
             }
         }
-
         return closest;
     }
 
@@ -184,13 +174,6 @@ public class EnemyBehavior : MonoBehaviour, IDamageableInterface
     void SetTarget(GameObject t)
     {
         currentTarget = t;
-
-        // Find the collider anywhere above this object
-        targetCollider = t.GetComponentInParent<Collider>();
-
-        // Optional safety check
-        if (targetCollider == null)
-            Debug.LogWarning($"No collider found for target {t.name}");
     }
 
     public void SetCheckpoints(Checkpoint[] checkpoints)
