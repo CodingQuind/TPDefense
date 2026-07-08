@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class HUDScript : MonoBehaviour
     private Image background;
     private PlayerController playerRef;
     private StatSystem playerStats;
+    private GameObject overlay;
 
     private TMP_Text alertText;
     private float currentHealth, maxHealth;
@@ -28,11 +30,14 @@ public class HUDScript : MonoBehaviour
         background = gameObject.GetComponent<Image>();
         background.enabled = false;
         GetComponent<Canvas>().enabled = false;
+        overlay = GameObject.Find("Overlay");
+        overlay.SetActive(false);
     }
 
     public void StartHud()
     {
         GetComponent<Canvas>().enabled = true;
+        overlay.SetActive(true);
     }
     // Update is called once per frame
     void Update()
@@ -87,6 +92,7 @@ public class HUDScript : MonoBehaviour
         ToggleBackground();
         buildMenu.SetActive(state);
         SpawnPanels(playerRef.GetAvailableBuildings());
+        
     }
 
     public void StartBuilding(BuildingData building)
@@ -100,17 +106,43 @@ public class HUDScript : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        foreach (var buildingData in buildingDataArray)
+
+        float totalWidth = 600f; // width of menu area
+        float spacing = totalWidth / (buildingDataArray.Length);
+        float startX = -totalWidth / 2f + 110f;
+
+        for (int i = 0; i < buildingDataArray.Length; i++)
         {
             GameObject panel = Instantiate(buildingPanelPrefab, buildMenu.transform);
-            BuildingPanelScript panelScript = panel.GetComponent<BuildingPanelScript>();
-            panelScript.data = buildingData;
+            var rect = panel.GetComponent<RectTransform>();
+            rect.anchoredPosition = new Vector2(startX + spacing * (i + 1), 0);
+
+            var panelScript = panel.GetComponent<BuildingPanelScript>();
+            panelScript.data = buildingDataArray[i];
         }
     }
 
     public void DisplayMessage(string message)
     {
         alertText.text = $"[Alert] {message}";
+        var fadeColor = new Color(alertText.color.r, alertText.color.g, alertText.color.b, 0f);
+        alertText.CrossFadeColor(fadeColor, 3f, true, true);
+        StartCoroutine(ResetAlert(3f));
+
+    }
+
+    private IEnumerator ResetAlert(float waitTime)
+    {
+        var elapsed = 0f;
+        while (elapsed < waitTime)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        alertText.text = "";
+        var fullColor = new Color(alertText.color.r, alertText.color.g, alertText.color.b, 1f);
+        alertText.CrossFadeColor(fullColor, 0f, true, true);
+
     }
 
     private void ToggleBackground()
@@ -118,6 +150,8 @@ public class HUDScript : MonoBehaviour
         background.enabled = !background.enabled;
         var gameSpeed = background.enabled ? 0f : 1f;
         StartCoroutine(UpdateGametime(gameSpeed));
+        overlay.SetActive(!overlay.activeSelf);
+
     }
 
     private IEnumerator UpdateGametime(float speed)

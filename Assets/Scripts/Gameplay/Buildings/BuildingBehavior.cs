@@ -39,57 +39,67 @@ public class BuildingBehavior : MonoBehaviour, IDamageableInterface
     {
         buildingData = data.buildingData;
         currentHealth = buildingData.buildingHealth;
-        projSpawnLoc = transform.Find("ProjectileLaunchpoint").gameObject.transform;
+        if (buildingData.buildingType == EBuildingType.Attack)
+        {
+            projSpawnLoc = transform.Find("ProjectileLaunchpoint").gameObject.transform;
+        }
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Update()
     {
-        attackTimer += Time.deltaTime;
-        GameObject newTarget = GetClosestEnemy();
-        if (newTarget != null)
+        switch (buildingData.buildingType)
         {
-            SetTarget(newTarget);
-        }
-        else
-        {
-            currentTarget = null;
-            targetCollider = null;
-        }
-
-        if (currentTarget != null)
-        {
-            float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
-
-            if (dist <= buildingData.attackRange)
-            {
-                state = AIState.Attack;
-            }
-        }
-
-        switch (state)
-        {
-
-            case AIState.Attack:
-                if (currentTarget == null)
+            case EBuildingType.Attack:
+                attackTimer += Time.deltaTime;
+                GameObject newTarget = GetClosestEnemy();
+                if (newTarget != null)
                 {
-                    state = AIState.Defending;
-                    break;
-                }
-
-                float attackDist = Vector3.Distance(transform.position, currentTarget.transform.position);
-
-                if (attackDist > buildingData.attackRange)
-                {
-                    state = AIState.Defending;
+                    SetTarget(newTarget);
                 }
                 else
                 {
-                    Attack(currentTarget);
+                    currentTarget = null;
+                    targetCollider = null;
+                }
+
+                if (currentTarget != null)
+                {
+                    float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
+
+                    if (dist <= buildingData.attackRange)
+                    {
+                        state = AIState.Attack;
+                    }
+                }
+
+                switch (state)
+                {
+                    case AIState.Attack:
+                        if (currentTarget == null)
+                        {
+                            state = AIState.Defending;
+                            break;
+                        }
+
+                        float attackDist = Vector3.Distance(transform.position, currentTarget.transform.position);
+
+                        if (attackDist > buildingData.attackRange)
+                        {
+                            state = AIState.Defending;
+                        }
+                        else
+                        {
+                            Attack(currentTarget);
+                        }
+                        break;
+                    case AIState.Dying:
+                        break;
+                    case AIState.Defending:
+                        break;
                 }
                 break;
-            case AIState.Dying:
-                break;
-            case AIState.Defending:
+            case EBuildingType.Defense:
+                state = AIState.Defending;
                 break;
         }
     }

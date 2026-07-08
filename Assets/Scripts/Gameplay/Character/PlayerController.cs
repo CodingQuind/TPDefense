@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private StatSystem stats;
     private ResourceSystem resources;
     private GameObject targetTag;
+    private float regenTimer = 0f;
 
     // --- Private Variables ---
     // Movement and Look
@@ -98,6 +99,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     {
         if (playerEnabled)
         {
+            HandleRegen();
             HandleLook();
             HandleMovement();
 
@@ -223,6 +225,18 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         controller.Move(velocity * Time.deltaTime);
     }
 
+    private void HandleRegen()
+    {
+        if (regenTimer >= StatSystemSettings.regenerationDelay)
+        {
+            HealthRegen();
+        }
+        else
+        {
+            regenTimer += Time.deltaTime;
+        }
+    }
+
     private void Interact(GameObject interactObject)
     {
         Debug.Log("Hit " + interactObject.name);
@@ -230,6 +244,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void TakeDamage(GameObject attacker, float damage, EDamageType damageType)
     {
+        regenTimer = 0f;
         if (stats.Damage(damage))
         {
             KillSelf();
@@ -249,7 +264,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         float damage = combat.Attack(EDamageType.physical);
         Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward.normalized);
 
-        if (Physics.SphereCast(ray, hitRadius, out RaycastHit hit, combat.GetAttackRange() + hitRadius))
+        if (Physics.Raycast(ray, out RaycastHit hit, combat.GetAttackRange() + hitRadius))
         {
             GameObject objectHit = hit.transform.gameObject;
             if (objectHit.TryGetComponent<IDamageableInterface>(out var damageable))
@@ -362,11 +377,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     public void StartBuilding(BuildingData building)
     {
         currentBuildingData = building;
-        ghostBuilding = Instantiate(building.buildingData.buildingPrefab);
-        foreach (var renderer in ghostBuilding.GetComponentsInChildren<Renderer>())
-        {
-            renderer.material.color = new Color(1f, 1f, 1f, 0.5f);
-        }
+        ghostBuilding = Instantiate(building.buildingData.ghostPrefab);
         foreach (var col in ghostBuilding.GetComponentsInChildren<Collider>())
         {
             col.enabled = false;
@@ -382,8 +393,14 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         if (ghostBuilding != null)
         {
             Instantiate(currentBuildingData.buildingData.buildingPrefab, ghostBuilding.transform.position, ghostBuilding.transform.rotation);
+            Destroy(ghostBuilding);
             ghostBuilding = null;
             buildMode = false;
         }
+    }
+
+    private void HealthRegen()
+    {
+        stats.Damage(StatSystemSettings.regenerationRate * Time.deltaTime * -1);
     }
 }
