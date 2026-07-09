@@ -67,4 +67,9 @@ public class Gamemode : MonoBehaviour
             spawnControl.SpawnEnemies(enemyPrefab, 3);
         }
     }
+
+    public void GameOver()
+    {
+        GameObject.FindGameObjectWithTag("Menu").GetComponent<MainMenu>().GameOver();
+    }
 }

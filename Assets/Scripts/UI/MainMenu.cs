@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class MainMenu : MonoBehaviour
     public GameObject storePage;
     public GameObject mainPage;
     public GameObject debugPanel;
+    public GameObject helpPage;
+    public GameObject gameOverPage;
 
     private Gamemode gmControls;
     private InputAction debugKey;
@@ -38,7 +41,9 @@ public class MainMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         mainPage.SetActive(false);
+        helpPage.SetActive(false);
         gmControls.StartGame();
+        
     }
 
     // ---Store Interactions---
@@ -54,5 +59,18 @@ public class MainMenu : MonoBehaviour
         playerRef.ShowHud();
         storePage.SetActive(false);
         gmControls.EnablePlayer();
+    }
+
+    public void GameOver()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        gameOverPage.SetActive(true);
+        gmControls.DisablePlayer();
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(0);
     }
 }

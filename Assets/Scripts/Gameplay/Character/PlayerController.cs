@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     public float jumpHeight = 1.2f;
     public float gravity = -9.81f;
     private bool playerEnabled = false;
+    public bool paused = false;
 
     [Header("Mouse Look")]
     public float mouseSensitivity = 5f;
@@ -40,7 +41,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
     private List<InputAction> actions = new();
     private InputAction sprintAction, moveAction, jumpAction;
     private InputAction lookAction;
-    private InputAction interactAction, attackAction, buildAction;
+    private InputAction interactAction, attackAction, buildAction, backAction;
 
     private Transform respawnPoint;
     private HUDScript hud;
@@ -64,6 +65,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         lookAction = InputSystem.actions.FindAction("look");
         attackAction = InputSystem.actions.FindAction("Attack");
         buildAction = InputSystem.actions.FindAction("BuildKey");
+        backAction = InputSystem.actions.FindAction("Back");
         actions.Add(sprintAction);
         actions.Add(moveAction);
         actions.Add(jumpAction);
@@ -71,6 +73,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
         actions.Add(lookAction);
         actions.Add(attackAction);
         actions.Add(buildAction);
+        actions.Add(backAction);
         // Component References
         combat = GetComponent<CombatSystem>();
         stats = GetComponent<StatSystem>();
@@ -103,7 +106,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
             HandleRegen();
             HandleLook();
             HandleMovement();
-
+            // --- Interact ---
             if (interactAction.WasPressedThisFrame())
             {
                 Ray ray = new(playerCamera.transform.position, playerCamera.transform.forward);
@@ -117,6 +120,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
                 }
 
             }
+            // --- Combat ---
             if (attackAction.WasPressedThisFrame())
             {
                 if (combat.CanAttack())
@@ -126,6 +130,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
                 }
             }
 
+            // --- Build Mode ---
             if (buildAction.WasPressedThisFrame())
             {
                 if (!buildMode)
@@ -161,6 +166,26 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
                     PlaceBuilding();
                     buildMode = false;
                 }
+            }
+
+            if (backAction.WasPressedThisFrame()) 
+            {
+                if (!paused)
+                {
+                    hud.ShowPauseMenu();
+                    backAction.Enable();
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                    paused = true;
+                }
+                else
+                {
+                    hud.HidePauseMenu();
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                    paused = false;
+                }
+
             }
 
 
@@ -425,6 +450,7 @@ public class PlayerController : MonoBehaviour, IDamageableInterface
 
     public void HideHud() { hud.HideOverlay(); }
     public void ShowHud() { hud.ShowOverlay(); }
+    public void SendAlertToHud(string message) { hud.DisplayMessage(message); }
 
     public void StartBuilding(BuildingData building)
     {

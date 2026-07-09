@@ -1,6 +1,5 @@
 using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,11 +9,13 @@ public class HUDScript : MonoBehaviour
     [SerializeField] private Image attackbarFill;
     [SerializeField] private GameObject buildMenu;
     [SerializeField] private GameObject buildingPanelPrefab;
+    [SerializeField] private TMP_Text moneyCount;
+
     private Image background;
     private PlayerController playerRef;
     private StatSystem playerStats;
     private GameObject overlay;
-    private GameObject deathPanel;
+    private GameObject deathPanel, pausePanel;
 
     private TMP_Text alertText;
     private GameObject buildButton;
@@ -37,6 +38,8 @@ public class HUDScript : MonoBehaviour
         buildButton = GameObject.Find("BuildButton");
         deathPanel = GameObject.Find("DeathPanel");
         deathPanel.SetActive(false);
+        pausePanel = GameObject.Find("PauseMenu");
+        pausePanel.SetActive(false);
     }
 
     public void StartHud()
@@ -52,6 +55,8 @@ public class HUDScript : MonoBehaviour
         {
             StartCoroutine(AnimateHealth(newHealth));
         }
+        if (playerRef != null) moneyCount.text = $"Money: {playerRef.GetMoney()}g";
+
     }
 
     private IEnumerator AnimateHealth(float newHealth)
@@ -214,5 +219,29 @@ public class HUDScript : MonoBehaviour
         deathPanel.SetActive(false);
         overlay.SetActive(true);
         buildButton.SetActive(true);
+    }
+
+    public void ShowPauseMenu()
+    {
+        ToggleBackground();
+        HideOverlay();
+        pausePanel.SetActive(true);
+        playerRef.DisablePlayer();
+    }
+
+    public void HidePauseMenu()
+    {
+        ToggleBackground();
+        ShowOverlay();
+        pausePanel.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        playerRef.EnablePlayer();
+        playerRef.paused = false;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }

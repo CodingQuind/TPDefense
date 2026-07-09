@@ -23,6 +23,6 @@ public class StoreScript : MonoBehaviour
             curClass = controller.GetClass();
             classText.text = "Current Class: " + curClass.ToString();
         }
-        
+
     }
 }
