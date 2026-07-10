@@ -10,6 +10,7 @@ public class PlayerBuildingController : MonoBehaviour
     private GameObject ghost;
     private BuildingData currentData;
     public BuildingData[] BuildingList { get; private set; }
+    private UpgradeObject[] activeUpgrades = new UpgradeObject[0];
 
     private void Awake()
     {
@@ -57,5 +58,14 @@ public class PlayerBuildingController : MonoBehaviour
     {
         currentData = data;
         ghost = Instantiate(data.buildingData.ghostPrefab);
+    }
+
+    public void AddUpgrade(UpgradeObject upgrade)
+    {
+        var newUpgrades = new UpgradeObject[activeUpgrades.Length + 1];
+        for (int i = 0; i < activeUpgrades.Length; i++)
+            newUpgrades[i] = activeUpgrades[i];
+        newUpgrades[activeUpgrades.Length] = upgrade;
+        activeUpgrades = newUpgrades;
     }
 }

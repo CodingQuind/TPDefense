@@ -21,7 +21,7 @@ public class UpgradesScript : MonoBehaviour
 
         playerRef = GameObject.FindGameObjectWithTag("Player");
         controller = playerRef.GetComponent<PlayerController>();
-        curClass = controller.GetClass();
+        curClass = controller.Combat.GetClass();
         upgradeTable = upgradeTables[curClass];
         RefreshPanel();
     }
@@ -33,7 +33,7 @@ public class UpgradesScript : MonoBehaviour
 
     public void RefreshClass() 
     { 
-        curClass = controller.GetClass();
+        curClass = controller.Combat.GetClass();
         upgradeTable = upgradeTables[curClass];
     }
 
@@ -73,11 +73,11 @@ public class UpgradesScript : MonoBehaviour
 
     public UpgradeObject CommitUpgrade(UpgradeObject upgrade, UpgradePanel panel)
     {
-        int availFunds = controller.GetMoney();
+        int availFunds = controller.Resource.Money;
         if (availFunds >= upgrade.cost)
         {
-            controller.SpendMoney(upgrade.cost);
-            controller.ApplyStatUpgrade(upgrade);
+            controller.Resource.SpendMoney(upgrade.cost);
+            controller.Combat.AddUpgrade(upgrade);
             panel.upgradeIcon.sprite = panel.upgradeCompleteIcon;
             panel.upgradeButton.interactable = false;
             panel.upgradeButton.GetComponentInChildren<TMP_Text>().text = "";

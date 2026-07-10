@@ -10,19 +10,17 @@ public class BuildingPanelScript : MonoBehaviour
     public Button buildButton;
     public Sprite upgradeCompleteIcon;
 
-    private PlayerController playerRef;
+    private PlayerController controller;
     private HUDScript hud;
-    private PlayerBuildingController buildController;
-    private PlayerResourceController resourceController;
 
     public void TryBuild()
     {
-        var money = resourceController.Money;
+        var money = controller.Resource.Money;
         
         if (money >= data.buildingData.buildingCost)
         {
-            resourceController.Money = resourceController.Money - (data.buildingData.buildingCost);
-            buildController.StartBuilding(data);
+            controller.Resource.SpendMoney(data.buildingData.buildingCost);
+            controller.Building.StartBuilding(data);
         }
         else
         {
@@ -34,8 +32,8 @@ public class BuildingPanelScript : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        hud = playerRef.GetComponentInChildren<HUDScript>();
+        controller = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        hud = controller.HUD;
 
         buildingIcon.sprite = data.buildingData.buildingIcon;
         buildingName.text = data.buildingData.buildingName;

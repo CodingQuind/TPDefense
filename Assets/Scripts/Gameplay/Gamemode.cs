@@ -5,6 +5,7 @@ public class Gamemode : MonoBehaviour
     public GameObject playerObject;
     private float resourceRegenTimer, regenInterval = 1f;
     private PlayerController playerController;
+    private PlayerLifecycleController playerLCController;
     private ResourceSystem resourceSystem;
     [SerializeField] private GameObject[] spawners;
     [SerializeField] private GameObject enemyPrefab;
@@ -16,6 +17,7 @@ public class Gamemode : MonoBehaviour
     {
         playerController = playerObject.GetComponent<PlayerController>();
         resourceSystem = playerController.gameObject.GetComponent<ResourceSystem>();
+        playerLCController = playerController.gameObject.GetComponent<PlayerLifecycleController>();
         resourceRegenTimer = 0f;
     }
 
@@ -41,13 +43,13 @@ public class Gamemode : MonoBehaviour
 
     public void DisablePlayer()
     {
-        playerController.DisablePlayer();
+        playerLCController.SuspendPlayer();
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
     public void EnablePlayer()
     {
-        playerController.EnablePlayer();
+        playerLCController.ResumePlayer();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -56,7 +58,7 @@ public class Gamemode : MonoBehaviour
     {
         resourceSystem.Start();
         started = true;
-        playerController.StartPlayer();
+        playerLCController.ResumePlayer();
     }
 
     private void SpawnEnemies()

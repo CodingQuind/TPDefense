@@ -49,4 +49,19 @@ public class PlayerCombatController : MonoBehaviour
                 dmg.TakeDamage(gameObject, stats.GetPhysicalDamage(), EDamageType.physical);
         }
     }
+
+    public float GetDamage()
+    {
+        return stats.GetPhysicalDamage();
+    }
+
+    public EClasses GetClass()
+    {
+        return stats.Class;
+    }
+
+    public void AddUpgrade(UpgradeObject upgrade)
+    {
+        stats.AddUpgrade(upgrade);
+    }
 }

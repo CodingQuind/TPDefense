@@ -17,7 +17,7 @@ public class EnemyStatSystem : BaseStatSystem
         base.InitializeStats();
     }
 
-    public float GetPhysicalDamage()
+    public override float GetPhysicalDamage()
     {
         return baseDamage;
     }

@@ -49,14 +49,14 @@ public class MainMenu : MonoBehaviour
     // ---Store Interactions---
     public void OpenStore()
     {
-        playerRef.HideHud();
+        playerRef.HUD.HideOverlay();
         storePage.SetActive(true);
         gmControls.DisablePlayer();
     }
 
     public void CloseStore()
     {
-        playerRef.ShowHud();
+        playerRef.HUD.ShowOverlay();
         storePage.SetActive(false);
         gmControls.EnablePlayer();
     }

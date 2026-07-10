@@ -4,23 +4,21 @@ using UnityEngine;
 public class StoreScript : MonoBehaviour
 {
     public TMP_Text classText;
-    private GameObject playerRef;
-    private PlayerController controller;
+    private PlayerStatSystem playerStats;
     private EClasses curClass;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        playerRef = GameObject.FindGameObjectWithTag("Player");
-        controller = playerRef.GetComponent<PlayerController>();
-        curClass = controller.GetClass();
+        playerStats = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().GetComponent<PlayerStatSystem>();
+        curClass = playerStats.Class;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (controller.GetClass() != curClass)
+        if (playerStats.Class != curClass)
         {
-            curClass = controller.GetClass();
+            curClass = playerStats.Class;
             classText.text = "Current Class: " + curClass.ToString();
         }
 

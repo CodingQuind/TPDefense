@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public PlayerBuildingController Building { get; private set; }
     public PlayerLifecycleController Lifecycle { get; private set; }
     public PlayerResourceController Resource { get; private set; }
+    public HUDScript HUD { get; private set; }
 
     private void Awake()
     {

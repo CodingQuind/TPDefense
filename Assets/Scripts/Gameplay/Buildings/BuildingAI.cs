@@ -219,8 +219,8 @@ public class BuildingAI : AIController
     /// </summary>
     protected override void KillSelf()
     {
-        PlayerController player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        player.SpendMoney((int)(-buildingData.buildingCost * 0.25f));
+        PlayerController controller = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        controller.Resource.SpendMoney((int)(-buildingData.buildingCost * 0.25f));
 
         Destroy(gameObject);
     }

@@ -43,4 +43,6 @@ public abstract class BaseStatSystem : MonoBehaviour
     {
         CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
     }
+
+    public virtual float GetPhysicalDamage() { return 0; }
 }

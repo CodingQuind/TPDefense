@@ -55,11 +55,11 @@ public class BuildingUpgradeScript : MonoBehaviour
 
     public UpgradeObject CommitUpgrade(UpgradeObject upgrade, BuildingUPanel panel)
     {
-        int availFunds = controller.GetMoney();
+        int availFunds = controller.Resource.Money;
         if (availFunds >= upgrade.cost)
         {
-            controller.SpendMoney(upgrade.cost);
-            controller.AddBuildingUpgrade(upgrade);
+            controller.Resource.SpendMoney(upgrade.cost);
+            controller.Building.AddUpgrade(upgrade);
             panel.upgradeIcon.sprite = panel.upgradeCompleteIcon;
             panel.purchaseButton.interactable = false;
             panel.purchaseButton.GetComponentInChildren<TMP_Text>().text = "";

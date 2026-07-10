@@ -17,7 +17,7 @@ public class HomebaseBehavior : MonoBehaviour, IDamageableInterface
         // Later use specific resistances
         if (lastAttackedTimer > lastAttackedBroadcastThreshold)
         {
-            playerRef.SendAlertToHud("Alert: Homebase under attack!");
+            //playerRef.SendAlertToHud("Alert: Homebase under attack!");
         }
         lastAttackedTimer = 0f;
         currentHealth -= damage;
@@ -29,7 +29,7 @@ public class HomebaseBehavior : MonoBehaviour, IDamageableInterface
         else if (currentHealth < maxHealth / 2)
         {
             GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-            playerRef.SendAlertToHud("Alert: Homebase health below 50%, enemies have been wiped");
+            //playerRef.SendAlertToHud("Alert: Homebase health below 50%, enemies have been wiped");
             foreach (GameObject enemy in enemies)
             {
                 Destroy(enemy);

@@ -17,8 +17,8 @@ public class PlayerStatSystem : BaseStatSystem
     private int baseStrength = 5, baseAgility = 4, baseIntelligence = 3, baseConstitution = 2;
     private int speedModifier = 1, jumpModifier = 1;
 
-    private int basePhysicalDmg = 10, baseMagicDmg = 10;
-    private EClasses currentClass = EClasses.Warrior;
+    private float basePhysicalDmg = 10, baseMagicDmg = 10;
+    public EClasses Class { get; private set; } = EClasses.Warrior;
 
     private List<UpgradeObject> appliedUpgrades = new();
 
@@ -69,9 +69,9 @@ public class PlayerStatSystem : BaseStatSystem
         MaxEnergy = (baseIntelligence * level) * 100;
     }
 
-    public int GetPhysicalDamage()
+    public override float GetPhysicalDamage()
     {
-        return currentClass switch
+        return Class switch
         {
             EClasses.Warrior => (int)(basePhysicalDmg + (baseStrength * 1.4f)),
             EClasses.Assassin => (int)(basePhysicalDmg + (baseAgility * 1.2f)),
@@ -81,7 +81,7 @@ public class PlayerStatSystem : BaseStatSystem
         };
     }
 
-    public int GetMagicDamage()
+    public float GetMagicDamage()
     {
         return baseMagicDmg + (baseIntelligence * 2);
     }
@@ -104,7 +104,7 @@ public class PlayerStatSystem : BaseStatSystem
                 break;
         }
 
-        currentClass = newClass;
+        Class = newClass;
         UpdateMaxHealth();
         UpdateMaxEnergy();
     }
