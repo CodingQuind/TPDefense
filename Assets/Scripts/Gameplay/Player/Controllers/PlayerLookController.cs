@@ -6,6 +6,7 @@ public class PlayerLookController : MonoBehaviour
     public Camera cam;
 
     private float xRot;
+    public bool LookEnabled { get; set; } = false;
 
     private void Awake()
     {
@@ -15,6 +16,8 @@ public class PlayerLookController : MonoBehaviour
 
     public void Tick()
     {
+        if (!LookEnabled) return;
+
         float mouseX = input.LookInput.x * 0.05f;
         float mouseY = input.LookInput.y * 0.05f;
 

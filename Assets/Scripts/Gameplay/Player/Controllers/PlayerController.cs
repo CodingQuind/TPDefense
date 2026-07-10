@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
         Building = GetComponent<PlayerBuildingController>();
         Lifecycle = GetComponent<PlayerLifecycleController>();
         Resource = GetComponent<PlayerResourceController>();
+        HUD = gameObject.transform.GetComponentInChildren<HUDScript>();
     }
 
     private void Start()

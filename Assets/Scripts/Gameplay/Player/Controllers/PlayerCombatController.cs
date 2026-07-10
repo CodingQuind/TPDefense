@@ -64,4 +64,6 @@ public class PlayerCombatController : MonoBehaviour
     {
         stats.AddUpgrade(upgrade);
     }
+
+    public float GetHealth() { return stats.CurrentHealth; }
 }

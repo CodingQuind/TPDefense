@@ -30,13 +30,10 @@ public class PlayerLifecycleController : MonoBehaviour
 
     public void SuspendPlayer()
     {
-        // Disable input
-        var input = GetComponent<PlayerInputHandler>();
-        input.enabled = false;
 
         // Disable movement/look/combat/building
         GetComponent<PlayerMovementController>().enabled = false;
-        GetComponent<PlayerLookController>().enabled = false;
+        GetComponent<PlayerLookController>().LookEnabled = false;
         GetComponent<PlayerCombatController>().enabled = false;
         GetComponent<PlayerBuildingController>().enabled = false;
 
@@ -47,13 +44,10 @@ public class PlayerLifecycleController : MonoBehaviour
 
     public void ResumePlayer()
     {
-        // Re-enable input
-        var input = GetComponent<PlayerInputHandler>();
-        input.enabled = true;
 
         // Re-enable subsystems
         GetComponent<PlayerMovementController>().enabled = true;
-        GetComponent<PlayerLookController>().enabled = true;
+        GetComponent<PlayerLookController>().LookEnabled = true;
         GetComponent<PlayerCombatController>().enabled = true;
         GetComponent<PlayerBuildingController>().enabled = true;
 

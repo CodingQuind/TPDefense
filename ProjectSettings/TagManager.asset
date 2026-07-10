@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - EnemyTarget
   - Menu
+  - Menu Camera
   layers:
   - Default
   - TransparentFX
@@ -15,8 +16,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Ghost
+  - Ground
   - 
   - 
   - 

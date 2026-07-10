@@ -103,8 +103,8 @@ public class EnemyAI : AIController
 
     private void Patrol()
     {
-        navAgent.isStopped = false;
-        navAgent.SetDestination(checkpoints[checkpointIndex].worldLoc.position);
+        StartMovement();
+        MoveTo(checkpoints[checkpointIndex].worldLoc.position);
 
         if (!navAgent.pathPending && navAgent.remainingDistance < 0.5f)
         {
@@ -114,13 +114,13 @@ public class EnemyAI : AIController
 
     private void Chase(GameObject target)
     {
-        navAgent.isStopped = false;
-        navAgent.SetDestination(target.transform.position);
+        StartMovement();
+        MoveTo(target.transform.position);
     }
 
     private void Attack(GameObject target)
     {
-        navAgent.isStopped = true;
+        StopMovement();
 
         if (attackTimer < attackInterval || !target.activeSelf)
             return;

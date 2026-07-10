@@ -15,6 +15,12 @@ public static class CharacterSettings
     public static EClasses characterClass;
     public static float attackSpeed = 1f, attackRange = 2f, attackDamage = 10f;
 }
+
+[System.Serializable]
+public static class BuildSystemSettings
+{
+    public static float buildRange = 25f;
+}
 [System.Serializable]
 public static class StatSystemSettings
 {

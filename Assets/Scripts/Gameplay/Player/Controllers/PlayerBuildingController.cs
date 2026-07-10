@@ -1,22 +1,30 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerBuildingController : MonoBehaviour
 {
+    private PlayerController controller;
     private PlayerInputHandler input;
     private HUDScript hud;
     private Camera cam;
 
-    private bool buildMode;
-    private GameObject ghost;
+    private bool buildMode = false;
+    private GameObject ghost = null;
     private BuildingData currentData;
-    public BuildingData[] BuildingList { get; private set; }
+    private float rotateSnapDegrees = 15f;
+    public float BuildRange { get; private set; }
+    public BuildingData[] startingBuildings;
+    public List<BuildingData> BuildingList { get; private set; } = new List<BuildingData>();
     private UpgradeObject[] activeUpgrades = new UpgradeObject[0];
 
     private void Awake()
     {
+        controller = GetComponent<PlayerController>();
         input = GetComponent<PlayerInputHandler>();
         hud = GetComponentInChildren<HUDScript>();
         cam = GetComponentInChildren<Camera>();
+        foreach (BuildingData data in startingBuildings) AddBuilding(data);
+        BuildRange = BuildSystemSettings.buildRange;
     }
 
     public void Tick()
@@ -26,24 +34,42 @@ public class PlayerBuildingController : MonoBehaviour
 
         if (ghost != null)
             UpdateGhostPosition();
+            UpdateGhostRotation();
     }
 
     private void ToggleBuildMode()
     {
         buildMode = !buildMode;
         hud.ToggleBuildMenu(buildMode);
-        Cursor.visible = buildMode;
-        Cursor.lockState = buildMode ? CursorLockMode.None : CursorLockMode.Locked;
+        switch (buildMode) 
+        {
+            case true:
+                controller.Lifecycle.SuspendPlayer();
+                break;
+            case false:
+                controller.Lifecycle.ResumePlayer();
+                break; 
+        }
     }
 
     private void UpdateGhostPosition()
     {
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f));
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (Physics.Raycast(ray, out RaycastHit hit, BuildRange, LayerMask.GetMask("Ground")))
             ghost.transform.position = hit.point + Vector3.down * 1.1f;
-
         if (Input.GetMouseButtonDown(0))
             PlaceBuilding();
+    }
+
+    private void UpdateGhostRotation()
+    {
+        float scroll = input.ScrollInput;
+
+        if (scroll > 0.1f)
+            ghost.transform.Rotate(Vector3.up, rotateSnapDegrees);
+
+        if (scroll < -0.1f)
+            ghost.transform.Rotate(Vector3.up, -rotateSnapDegrees);
     }
 
     private void PlaceBuilding()
@@ -56,6 +82,7 @@ public class PlayerBuildingController : MonoBehaviour
 
     public void StartBuilding(BuildingData data)
     {
+        ToggleBuildMode();
         currentData = data;
         ghost = Instantiate(data.buildingData.ghostPrefab);
     }
@@ -67,5 +94,10 @@ public class PlayerBuildingController : MonoBehaviour
             newUpgrades[i] = activeUpgrades[i];
         newUpgrades[activeUpgrades.Length] = upgrade;
         activeUpgrades = newUpgrades;
+    }
+
+    public void AddBuilding(BuildingData data) 
+    {
+        BuildingList.Add(data);
     }
 }

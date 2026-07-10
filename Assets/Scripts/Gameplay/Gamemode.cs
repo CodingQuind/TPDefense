@@ -4,21 +4,30 @@ public class Gamemode : MonoBehaviour
 {
     public GameObject playerObject;
     private float resourceRegenTimer, regenInterval = 1f;
-    private PlayerController playerController;
-    private PlayerLifecycleController playerLCController;
-    private ResourceSystem resourceSystem;
+    private PlayerController controller;
     [SerializeField] private GameObject[] spawners;
     [SerializeField] private GameObject enemyPrefab;
     private float enemyTimer = 0f, waveTimer = 10f;
     private SpawnerBehavior spawnControl;
     private bool started;
+
+    private Camera playerCamera, menuCamera;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        playerController = playerObject.GetComponent<PlayerController>();
-        resourceSystem = playerController.gameObject.GetComponent<ResourceSystem>();
-        playerLCController = playerController.gameObject.GetComponent<PlayerLifecycleController>();
+    }
+
+    void Awake()
+    {
+        controller = playerObject.GetComponent<PlayerController>();
         resourceRegenTimer = 0f;
+        started = false;
+        playerCamera = controller.gameObject.GetComponentInChildren<Camera>();
+        menuCamera = GameObject.FindGameObjectWithTag("Menu Camera").GetComponent<Camera>();
+        playerCamera.enabled = false;
+        menuCamera.enabled = true;
+        DisablePlayer();
     }
 
     // Update is called once per frame
@@ -31,7 +40,7 @@ public class Gamemode : MonoBehaviour
             if (resourceRegenTimer >= regenInterval)
             {
                 resourceRegenTimer = 0;
-                resourceSystem.AddMoney(GameSettings.moneyRegenAmt);
+                controller.Resource.AddMoney(GameSettings.moneyRegenAmt);
             }
             if (enemyTimer >= waveTimer)
             {
@@ -43,22 +52,23 @@ public class Gamemode : MonoBehaviour
 
     public void DisablePlayer()
     {
-        playerLCController.SuspendPlayer();
+        controller.Lifecycle.SuspendPlayer();
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
     public void EnablePlayer()
     {
-        playerLCController.ResumePlayer();
+        controller.Lifecycle.ResumePlayer();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     public void StartGame()
     {
-        resourceSystem.Start();
         started = true;
-        playerLCController.ResumePlayer();
+        controller.Lifecycle.ResumePlayer();
+        controller.HUD.StartHud();
+        SwapCamera();
     }
 
     private void SpawnEnemies()
@@ -73,5 +83,12 @@ public class Gamemode : MonoBehaviour
     public void GameOver()
     {
         GameObject.FindGameObjectWithTag("Menu").GetComponent<MainMenu>().GameOver();
+        SwapCamera();
+    }
+
+    private void SwapCamera()
+    {
+        playerCamera.enabled = !playerCamera.enabled;
+        menuCamera.enabled = !menuCamera.enabled;
     }
 }

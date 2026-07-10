@@ -22,11 +22,6 @@ public class BuildingAI : AIController
     protected float currentHealth;
 
     /// <summary>
-    /// The current target enemy within range.
-    /// </summary>
-    protected GameObject currentTarget;
-
-    /// <summary>
     /// Cached collider of the current target.
     /// </summary>
     protected Collider targetCollider;

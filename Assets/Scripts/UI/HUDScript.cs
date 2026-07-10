@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,10 +13,7 @@ public class HUDScript : MonoBehaviour
     [SerializeField] private TMP_Text moneyCount;
 
     private Image background;
-    private PlayerController playerRef;
-    private PlayerBuildingController buildingController;
-    private PlayerLifecycleController lifecycleController;
-    private PlayerStatSystem playerStats;
+    private PlayerController controller;
     private GameObject overlay;
     private GameObject deathPanel, pausePanel;
     private float currentHealth, maxHealth;
@@ -23,13 +21,9 @@ public class HUDScript : MonoBehaviour
     private GameObject buildButton;
 
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
-        playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        playerStats = playerRef.GetComponent<PlayerStatSystem>();
-        buildingController = playerRef.GetComponent<PlayerBuildingController>();
-        lifecycleController = playerRef.GetComponent<PlayerLifecycleController>();
+        controller = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         alertText = GameObject.Find("AlertText").GetComponent<TMP_Text>();
         alertText.text = "";
         background = gameObject.GetComponent<Image>();
@@ -42,6 +36,11 @@ public class HUDScript : MonoBehaviour
         deathPanel.SetActive(false);
         pausePanel = GameObject.Find("PauseMenu");
         pausePanel.SetActive(false);
+
+    }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
         Refresh();
     }
 
@@ -53,12 +52,12 @@ public class HUDScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float newHealth = playerStats.CurrentHealth;
+        float newHealth = controller.Combat.GetHealth();
         if (currentHealth - newHealth != 0)
         {
             StartCoroutine(AnimateHealth(newHealth));
         }
-        if (playerRef != null) moneyCount.text = $"Money: {playerRef}g";
+        if (controller != null) moneyCount.text = $"Money: {controller.Resource.Money}g";
 
     }
 
@@ -96,19 +95,19 @@ public class HUDScript : MonoBehaviour
 
     public void Refresh()
     {
-        maxHealth = playerStats.MaxHealth;
-        currentHealth = playerStats.CurrentHealth;
+        maxHealth = controller.Combat.GetHealth();
+        currentHealth = controller.Combat.GetHealth();
     }
 
     public void ToggleBuildMenu(bool state)
     {
         ToggleBackground();
         buildMenu.SetActive(state);
-        SpawnPanels(buildingController.BuildingList);
+        SpawnPanels(controller.Building.BuildingList);
         
     }
 
-    public void SpawnPanels(BuildingData[] buildingDataArray)
+    public void SpawnPanels(List<BuildingData> buildings)
     {
         foreach (Transform child in buildMenu.transform)
         {
@@ -116,17 +115,17 @@ public class HUDScript : MonoBehaviour
         }
 
         float totalWidth = 600f; // width of menu area
-        float spacing = totalWidth / (buildingDataArray.Length);
+        float spacing = totalWidth / (buildings.Count);
         float startX = -totalWidth / 2f + 110f;
 
-        for (int i = 0; i < buildingDataArray.Length; i++)
+        for (int i = 0; i < buildings.Count; i++)
         {
             GameObject panel = Instantiate(buildingPanelPrefab, buildMenu.transform);
             var rect = panel.GetComponent<RectTransform>();
             rect.anchoredPosition = new Vector2(startX + spacing * (i + 1), 0);
 
             var panelScript = panel.GetComponent<BuildingPanelScript>();
-            panelScript.data = buildingDataArray[i];
+            panelScript.data = buildings[i];
         }
     }
 
@@ -224,7 +223,7 @@ public class HUDScript : MonoBehaviour
         ToggleBackground();
         HideOverlay();
         pausePanel.SetActive(true);
-        lifecycleController.SuspendPlayer();
+        controller.Lifecycle.SuspendPlayer();
     }
 
     public void HidePauseMenu()
@@ -234,7 +233,7 @@ public class HUDScript : MonoBehaviour
         pausePanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        lifecycleController.ResumePlayer();
+        controller.Lifecycle.ResumePlayer();
     }
 
     public void QuitGame()

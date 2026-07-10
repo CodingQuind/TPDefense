@@ -10,8 +10,9 @@ public class PlayerInputHandler : MonoBehaviour
     public bool InteractPressed { get; private set; }
     public bool BuildPressed { get; private set; }
     public bool BackPressed { get; private set; }
+    public float ScrollInput { get; private set; }
 
-    private InputAction move, look, jump, sprint, attack, interact, build, back;
+    private InputAction move, look, jump, sprint, attack, interact, build, back, scroll;
 
     public void Initialize()
     {
@@ -23,9 +24,11 @@ public class PlayerInputHandler : MonoBehaviour
         interact = InputSystem.actions.FindAction("interact");
         build = InputSystem.actions.FindAction("BuildKey");
         back = InputSystem.actions.FindAction("Back");
+        scroll = InputSystem.actions.FindAction("scroll");
 
         move.Enable(); look.Enable(); jump.Enable(); sprint.Enable();
         attack.Enable(); interact.Enable(); build.Enable(); back.Enable();
+        scroll.Enable();
     }
 
     private void Update()
@@ -38,5 +41,6 @@ public class PlayerInputHandler : MonoBehaviour
         InteractPressed = interact.WasPressedThisFrame();
         BuildPressed = build.WasPressedThisFrame();
         BackPressed = back.WasPressedThisFrame();
+        ScrollInput = scroll.ReadValue<float>();
     }
 }

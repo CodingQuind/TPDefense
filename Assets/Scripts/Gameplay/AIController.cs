@@ -31,7 +31,7 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
         navAgent = GetComponent<NavMeshAgent>();
 
         stats.InitializeStats();
-        navAgent.speed = moveSpeed;
+        if (navAgent != null) navAgent.speed = moveSpeed;
     }
 
     protected virtual void Update()
@@ -87,5 +87,24 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
         gameObject.tag = "Untagged";
 
         Destroy(gameObject, 3f);
+    }
+
+    protected virtual void MoveTo(Vector3 position)
+    {
+        if (navAgent == null) return;
+        navAgent.isStopped = false;
+        navAgent.SetDestination(position);
+    }
+
+    protected virtual void StopMovement()
+    {
+        if (navAgent == null) return;
+        navAgent.isStopped = true;
+    }
+
+    protected virtual void StartMovement()
+    {
+        if (navAgent == null) return;
+        navAgent.isStopped = true;
     }
 }
