@@ -103,7 +103,6 @@ public class EnemyAI : AIController
 
     private void Patrol()
     {
-        StartMovement();
         MoveTo(checkpoints[checkpointIndex].worldLoc.position);
 
         if (!navAgent.pathPending && navAgent.remainingDistance < 0.5f)
@@ -114,7 +113,6 @@ public class EnemyAI : AIController
 
     private void Chase(GameObject target)
     {
-        StartMovement();
         MoveTo(target.transform.position);
     }
 
@@ -135,9 +133,7 @@ public class EnemyAI : AIController
 
     public void SetCheckpoints(Checkpoint[] checkpoints)
     {
-        this.checkpoints = new();
-        foreach (var check in checkpoints)
-            this.checkpoints.Add(check);
+        this.checkpoints = new List<Checkpoint>(checkpoints);
     }
 }
 

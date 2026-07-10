@@ -101,10 +101,4 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
         if (navAgent == null) return;
         navAgent.isStopped = true;
     }
-
-    protected virtual void StartMovement()
-    {
-        if (navAgent == null) return;
-        navAgent.isStopped = true;
-    }
 }

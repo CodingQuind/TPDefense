@@ -15,7 +15,7 @@ public class PlayerBuildingController : MonoBehaviour
     public float BuildRange { get; private set; }
     public BuildingData[] startingBuildings;
     public List<BuildingData> BuildingList { get; private set; } = new List<BuildingData>();
-    private UpgradeObject[] activeUpgrades = new UpgradeObject[0];
+    private List<UpgradeObject> activeUpgrades = new List<UpgradeObject>();
 
     private void Awake()
     {
@@ -33,8 +33,10 @@ public class PlayerBuildingController : MonoBehaviour
             ToggleBuildMode();
 
         if (ghost != null)
+        {
             UpdateGhostPosition();
             UpdateGhostRotation();
+        }
     }
 
     private void ToggleBuildMode()
@@ -89,11 +91,7 @@ public class PlayerBuildingController : MonoBehaviour
 
     public void AddUpgrade(UpgradeObject upgrade)
     {
-        var newUpgrades = new UpgradeObject[activeUpgrades.Length + 1];
-        for (int i = 0; i < activeUpgrades.Length; i++)
-            newUpgrades[i] = activeUpgrades[i];
-        newUpgrades[activeUpgrades.Length] = upgrade;
-        activeUpgrades = newUpgrades;
+        activeUpgrades.Add(upgrade);
     }
 
     public void AddBuilding(BuildingData data) 

@@ -17,11 +17,6 @@ public class BuildingAI : AIController
     protected BuildingDataStruct buildingData;
 
     /// <summary>
-    /// Current health of the building.
-    /// </summary>
-    protected float currentHealth;
-
-    /// <summary>
     /// Cached collider of the current target.
     /// </summary>
     protected Collider targetCollider;
@@ -42,7 +37,6 @@ public class BuildingAI : AIController
         base.Start();
 
         buildingData = data.buildingData;
-        currentHealth = buildingData.buildingHealth;
 
         // Buildings do not move
         if (navAgent != null)
@@ -198,18 +192,6 @@ public class BuildingAI : AIController
     }
 
     /// <summary>
-    /// Applies damage to the building and destroys it if health reaches zero.
-    /// </summary>
-    public override void TakeDamage(GameObject attacker, float damage, EDamageType damageType)
-    {
-        currentHealth -= damage;
-        if (currentHealth <= 0)
-        {
-            KillSelf();
-        }
-    }
-
-    /// <summary>
     /// Handles building destruction and refunds partial cost.
     /// </summary>
     protected override void KillSelf()
@@ -223,21 +205,4 @@ public class BuildingAI : AIController
     /// <summary>
     /// Applies stat upgrades to the building.
     /// </summary>
-    public virtual void ApplyUpgrade(UpgradeObject upgrade)
-    {
-        foreach (var upgradeObj in upgrade.statUpgradesList)
-        {
-            switch (upgradeObj.upgradeType)
-            {
-                case EUpgradeType.buildingDamage:
-                    buildingData.baseDamage += upgradeObj.upgradeValue;
-                    break;
-
-                case EUpgradeType.buildingHealth:
-                    buildingData.buildingHealth += upgradeObj.upgradeValue;
-                    currentHealth += upgradeObj.upgradeValue;
-                    break;
-            }
-        }
     }
-}

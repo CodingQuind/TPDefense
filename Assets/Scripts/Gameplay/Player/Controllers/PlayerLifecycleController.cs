@@ -32,10 +32,11 @@ public class PlayerLifecycleController : MonoBehaviour
     {
 
         // Disable movement/look/combat/building
-        GetComponent<PlayerMovementController>().enabled = false;
-        GetComponent<PlayerLookController>().LookEnabled = false;
-        GetComponent<PlayerCombatController>().enabled = false;
-        GetComponent<PlayerBuildingController>().enabled = false;
+        var controller = GetComponent<PlayerController>();
+        controller.Movement.enabled = false;
+        controller.Look.LookEnabled = false;
+        controller.Combat.enabled = false;
+        controller.Building.enabled = false;
 
         // Unlock cursor for menus
         Cursor.lockState = CursorLockMode.None;
@@ -46,10 +47,11 @@ public class PlayerLifecycleController : MonoBehaviour
     {
 
         // Re-enable subsystems
-        GetComponent<PlayerMovementController>().enabled = true;
-        GetComponent<PlayerLookController>().LookEnabled = true;
-        GetComponent<PlayerCombatController>().enabled = true;
-        GetComponent<PlayerBuildingController>().enabled = true;
+        var controller = GetComponent<PlayerController>();
+        controller.Movement.enabled = true;
+        controller.Look.LookEnabled = true;
+        controller.Combat.enabled = true;
+        controller.Building.enabled = true;
 
         // Lock cursor back to gameplay
         Cursor.lockState = CursorLockMode.Locked;
