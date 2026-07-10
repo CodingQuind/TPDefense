@@ -13,21 +13,23 @@ public class HUDScript : MonoBehaviour
 
     private Image background;
     private PlayerController playerRef;
-    private StatSystem playerStats;
+    private PlayerBuildingController buildingController;
+    private PlayerLifecycleController lifecycleController;
+    private PlayerStatSystem playerStats;
     private GameObject overlay;
     private GameObject deathPanel, pausePanel;
-
+    private float currentHealth, maxHealth;
     private TMP_Text alertText;
     private GameObject buildButton;
-    private float currentHealth, maxHealth;
+
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        playerStats = playerRef.GetComponent<StatSystem>();
-        currentHealth = playerStats.maxHealth;
-        maxHealth = playerStats.maxHealth;
+        playerStats = playerRef.GetComponent<PlayerStatSystem>();
+        buildingController = playerRef.GetComponent<PlayerBuildingController>();
+        lifecycleController = playerRef.GetComponent<PlayerLifecycleController>();
         alertText = GameObject.Find("AlertText").GetComponent<TMP_Text>();
         alertText.text = "";
         background = gameObject.GetComponent<Image>();
@@ -40,6 +42,7 @@ public class HUDScript : MonoBehaviour
         deathPanel.SetActive(false);
         pausePanel = GameObject.Find("PauseMenu");
         pausePanel.SetActive(false);
+        Refresh();
     }
 
     public void StartHud()
@@ -50,12 +53,12 @@ public class HUDScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float newHealth = playerStats.currentHealth;
+        float newHealth = playerStats.CurrentHealth;
         if (currentHealth - newHealth != 0)
         {
             StartCoroutine(AnimateHealth(newHealth));
         }
-        if (playerRef != null) moneyCount.text = $"Money: {playerRef.GetMoney()}g";
+        if (playerRef != null) moneyCount.text = $"Money: {playerRef}g";
 
     }
 
@@ -93,21 +96,16 @@ public class HUDScript : MonoBehaviour
 
     public void Refresh()
     {
-        maxHealth = playerStats.maxHealth;
-        currentHealth = playerStats.maxHealth;
+        maxHealth = playerStats.MaxHealth;
+        currentHealth = playerStats.CurrentHealth;
     }
 
     public void ToggleBuildMenu(bool state)
     {
         ToggleBackground();
         buildMenu.SetActive(state);
-        SpawnPanels(playerRef.GetAvailableBuildings());
+        SpawnPanels(buildingController.BuildingList);
         
-    }
-
-    public void StartBuilding(BuildingData building)
-    {
-        playerRef.StartBuilding(building);
     }
 
     public void SpawnPanels(BuildingData[] buildingDataArray)
@@ -226,7 +224,7 @@ public class HUDScript : MonoBehaviour
         ToggleBackground();
         HideOverlay();
         pausePanel.SetActive(true);
-        playerRef.DisablePlayer();
+        lifecycleController.SuspendPlayer();
     }
 
     public void HidePauseMenu()
@@ -236,8 +234,7 @@ public class HUDScript : MonoBehaviour
         pausePanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        playerRef.EnablePlayer();
-        playerRef.paused = false;
+        lifecycleController.ResumePlayer();
     }
 
     public void QuitGame()

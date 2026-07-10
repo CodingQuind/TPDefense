@@ -6,7 +6,7 @@ public class DebugScript : MonoBehaviour
 {
     private GameObject playerRef;
     private PlayerController controller;
-    private StatSystem stats;
+    private BaseStatSystem stats;
     public TMP_Text debugTextElement;
     private InputAction debugKey;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -14,7 +14,7 @@ public class DebugScript : MonoBehaviour
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
         controller = playerRef.GetComponent<PlayerController>();
-        stats = playerRef.GetComponent<StatSystem>();
+        stats = playerRef.GetComponent<BaseStatSystem>();
         debugKey = InputSystem.actions.FindAction("Attack");
 
     }
@@ -22,7 +22,7 @@ public class DebugScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        debugTextElement.text = $"Player: class={controller.GetClass()}, strength={stats.GetStrength()}, agility={stats.GetAgility()}, " 
-            + $"intelligence={stats.GetIntelligence()}, constitution={stats.GetConstitution()}, level={stats.GetLevel()}, money={controller.GetMoney()}";
+        /*debugTextElement.text = $"Player: class={controller.GetClass()}, strength={stats.GetStrength()}, agility={stats.GetAgility()}, " 
+            + $"intelligence={stats.GetIntelligence()}, constitution={stats.GetConstitution()}, level={stats.GetLevel()}, money={controller.GetMoney()}";*/
     }
 }

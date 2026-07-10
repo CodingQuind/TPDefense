@@ -12,14 +12,17 @@ public class BuildingPanelScript : MonoBehaviour
 
     private PlayerController playerRef;
     private HUDScript hud;
+    private PlayerBuildingController buildController;
+    private PlayerResourceController resourceController;
 
     public void TryBuild()
     {
+        var money = resourceController.Money;
         
-        if (playerRef.GetMoney() >= data.buildingData.buildingCost)
+        if (money >= data.buildingData.buildingCost)
         {
-            playerRef.SpendMoney(data.buildingData.buildingCost);
-            hud.StartBuilding(data);
+            resourceController.Money = resourceController.Money - (data.buildingData.buildingCost);
+            buildController.StartBuilding(data);
         }
         else
         {

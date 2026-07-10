@@ -1418,6 +1418,18 @@ PrefabInstance:
       propertyPath: m_Center.z
       value: -0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 2731861895844462812, guid: f22bf3b084402514594d7f950860fd49, type: 3}
+      propertyPath: state
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2731861895844462812, guid: f22bf3b084402514594d7f950860fd49, type: 3}
+      propertyPath: attackRange
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2731861895844462812, guid: f22bf3b084402514594d7f950860fd49, type: 3}
+      propertyPath: detectionRange
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 3836384369499871905, guid: f22bf3b084402514594d7f950860fd49, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.2

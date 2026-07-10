@@ -107,7 +107,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cb29598854641e449d87896d47414ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingBehavior
+  animSystem: {fileID: 0}
+  state: 5
+  detectionRange: 0
+  attackRange: 0
   data: {fileID: 11400000, guid: 2810382a6454c964aaa58c579b2ca661, type: 2}
+  projectilePrefab: {fileID: 0}
 --- !u!65 &2246350008161376745
 BoxCollider:
   m_ObjectHideFlags: 0

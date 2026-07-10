@@ -21,8 +21,8 @@ public class SpawnerBehavior : MonoBehaviour
         for (int i = 0; i < amt; i++)
         {
             GameObject go = Instantiate(enemyPrefab, transform.position, transform.rotation);
-            EnemyBehavior enemyBehavior = go.GetComponent<EnemyBehavior>();
-            enemyBehavior.SetCheckpoints(this.checkpoints);
+            EnemyAI enemyAI = go.GetComponent<EnemyAI>();
+            enemyAI.SetCheckpoints(this.checkpoints);
         }
     }
 }
