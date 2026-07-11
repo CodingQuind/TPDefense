@@ -10,11 +10,12 @@ public class Gamemode : MonoBehaviour
     private SpawnerBehavior spawnControl;
     private bool started;
 
-    private Camera playerCamera, menuCamera;
+    public CameraManager camManager { get; private set; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        camManager.ShowMainMenu();
         DisablePlayer();
     }
 
@@ -23,10 +24,8 @@ public class Gamemode : MonoBehaviour
         controller = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         resourceRegenTimer = 0f;
         started = false;
-        playerCamera = controller.gameObject.GetComponentInChildren<Camera>();
-        menuCamera = GameObject.FindGameObjectWithTag("Menu Camera").GetComponent<Camera>();
-        playerCamera.enabled = false;
-        menuCamera.enabled = true;
+        camManager = GetComponent<CameraManager>();
+
     }
 
     // Update is called once per frame
@@ -67,7 +66,7 @@ public class Gamemode : MonoBehaviour
         started = true;
         controller.Lifecycle.ResumePlayer();
         controller.HUD.StartHud();
-        SwapCamera();
+        camManager.ShowGameplay();
     }
 
     private void SpawnEnemies()
@@ -82,12 +81,6 @@ public class Gamemode : MonoBehaviour
     public void GameOver()
     {
         GameObject.FindGameObjectWithTag("Menu").GetComponent<MainMenu>().GameOver();
-        SwapCamera();
     }
 
-    public void SwapCamera()
-    {
-        playerCamera.enabled = !playerCamera.enabled;
-        menuCamera.enabled = !menuCamera.enabled;
-    }
 }

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4040689958927228150}
   - component: {fileID: 5799423260165844747}
   - component: {fileID: 6859634416503622100}
-  - component: {fileID: 7011430179097430860}
   - component: {fileID: 5042044098779062694}
   m_Layer: 6
   m_Name: WallGhostPrefab
@@ -94,24 +93,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &7011430179097430860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1388877350867071038}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cb29598854641e449d87896d47414ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingBehavior
-  animSystem: {fileID: 0}
-  state: 0
-  detectionRange: 10
-  attackRange: 2
-  data: {fileID: 11400000, guid: 2810382a6454c964aaa58c579b2ca661, type: 2}
-  projectilePrefab: {fileID: 0}
 --- !u!65 &5042044098779062694
 BoxCollider:
   m_ObjectHideFlags: 0

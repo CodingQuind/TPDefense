@@ -52,7 +52,7 @@ public class MainMenu : MonoBehaviour
         playerRef.HUD.HideOverlay();
         storePage.SetActive(true);
         gmControls.DisablePlayer();
-        gmControls.SwapCamera();
+        gmControls.camManager.ShowMainMenu();
         Time.timeScale = 0f;
     }
 
@@ -61,7 +61,7 @@ public class MainMenu : MonoBehaviour
         Time.timeScale = 1f;
         playerRef.HUD.ShowOverlay();
         storePage.SetActive(false);
-        gmControls.SwapCamera();
+        gmControls.camManager.ShowGameplay();
         gmControls.EnablePlayer();
     }
 
