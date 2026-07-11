@@ -131,7 +131,7 @@ public class BuildingAI : AIController
     /// <summary>
     /// Sets the current target and caches its collider.
     /// </summary>
-    protected virtual void SetTarget(GameObject t)
+    protected new virtual void SetTarget(GameObject t)
     {
         currentTarget = t;
         targetCollider = t.GetComponent<Collider>();

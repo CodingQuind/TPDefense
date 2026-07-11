@@ -11,19 +11,29 @@ public class HealthBar : MonoBehaviour
 
     void Start()
     {
-        cam = Camera.main;
+        
+
     }
 
     void LateUpdate()
     {
-        // Follow the target
-        transform.position = target.position + offset;
+        if (cam != null)
+        {
+            // Follow the target
+            transform.position = target.position + offset;
 
-        // Face the camera
-        transform.rotation = Quaternion.LookRotation(transform.position - cam.transform.position);
+            // Face the camera
+            transform.rotation = Quaternion.LookRotation(transform.position - cam.transform.position);
+        }
     }
 
     public void SetHealth(float current, float max)
+    {
+        cam = Camera.main;
+        StartCoroutine(AnimateHealth(current, max));
+    }
+
+    public void UpdateHealth(float current, float max)
     {
         StartCoroutine(AnimateHealth(current, max));
     }

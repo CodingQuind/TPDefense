@@ -11,15 +11,15 @@ public static class GameSettings
 public static class CharacterSettings
 {
     public static string characterName;
-    public static float characterSpeed = 5f, characterSprintSpeed = 8f, interactRange = 5f;
+    public static float characterSpeed = 8f, characterSprintSpeed = 15f, interactRange = 5f;
     public static EClasses characterClass;
-    public static float attackSpeed = 1f, attackRange = 2f, attackDamage = 10f;
+    public static float attackSpeed = .5f, attackRange = 3f, attackDamage = 15f;
 }
 
 [System.Serializable]
 public static class BuildSystemSettings
 {
-    public static float buildRange = 25f;
+    public static float buildRange = 15f;
 }
 [System.Serializable]
 public static class StatSystemSettings

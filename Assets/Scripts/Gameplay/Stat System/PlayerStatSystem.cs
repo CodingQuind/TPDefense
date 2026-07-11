@@ -10,12 +10,15 @@ public class PlayerStatSystem : BaseStatSystem
     [Header("Player Attributes")]
     [SerializeField] private PlayerController playerController;
 
-    private int level = StatSystemSettings.defaultLevel;
-    private int currentXp = StatSystemSettings.defaultXp;
+    public  int Level { get; private set; } = StatSystemSettings.defaultLevel;
+    public int XP { get; private set; } = StatSystemSettings.defaultXp;
     private int requiredXp;
 
-    private int baseStrength = 5, baseAgility = 4, baseIntelligence = 3, baseConstitution = 2;
-    private int speedModifier = 1, jumpModifier = 1;
+    public int Strength { get; private set; } = 5;
+    public int Agility { get; private set; } = 4;
+    public int Intelligence { get; private set; } = 3; 
+    public int Constitution { get; private set; } = 2;
+    private int SpeedModifier = 1, jumpModifier = 1;
 
     private float basePhysicalDmg = 10, baseMagicDmg = 10;
     public EClasses Class { get; private set; } = EClasses.Warrior;
@@ -29,7 +32,7 @@ public class PlayerStatSystem : BaseStatSystem
 
         base.InitializeStats();
 
-        requiredXp = CalculateRequiredXp(level);
+        requiredXp = CalculateRequiredXp(Level);
     }
 
     private int CalculateRequiredXp(int level)
@@ -39,16 +42,16 @@ public class PlayerStatSystem : BaseStatSystem
 
     public void GrantXp(int xp)
     {
-        currentXp += xp;
-        if (currentXp >= requiredXp)
+        XP += xp;
+        if (XP >= requiredXp)
             LevelUp();
     }
 
     private void LevelUp()
     {
-        level++;
-        currentXp = 0;
-        requiredXp = CalculateRequiredXp(level);
+        Level++;
+        XP = 0;
+        requiredXp = CalculateRequiredXp(Level);
 
         float oldHealth = MaxHealth;
         UpdateMaxHealth();
@@ -61,29 +64,29 @@ public class PlayerStatSystem : BaseStatSystem
 
     private void UpdateMaxHealth()
     {
-        MaxHealth = (baseConstitution * level) * 1000;
+        MaxHealth = (Constitution * Level) * 1000;
     }
 
     private void UpdateMaxEnergy()
     {
-        MaxEnergy = (baseIntelligence * level) * 100;
+        MaxEnergy = (Intelligence * Level) * 100;
     }
 
     public override float GetPhysicalDamage()
     {
         return Class switch
         {
-            EClasses.Warrior => (int)(basePhysicalDmg + (baseStrength * 1.4f)),
-            EClasses.Assassin => (int)(basePhysicalDmg + (baseAgility * 1.2f)),
-            EClasses.Mage => (int)(basePhysicalDmg + (baseStrength * 1.4f)),
-            EClasses.Builder => (int)(basePhysicalDmg + (baseStrength * 1.4f)),
+            EClasses.Warrior => (int)(basePhysicalDmg + (Strength * 1.4f)),
+            EClasses.Assassin => (int)(basePhysicalDmg + (Agility * 1.2f)),
+            EClasses.Mage => (int)(basePhysicalDmg + (Strength * 1.4f)),
+            EClasses.Builder => (int)(basePhysicalDmg + (Strength * 1.4f)),
             _ => basePhysicalDmg
         };
     }
 
     public float GetMagicDamage()
     {
-        return baseMagicDmg + (baseIntelligence * 2);
+        return baseMagicDmg + (Intelligence * 2);
     }
 
     public void ClassUpdate(EClasses newClass)
@@ -91,16 +94,16 @@ public class PlayerStatSystem : BaseStatSystem
         switch (newClass)
         {
             case EClasses.Warrior:
-                baseStrength = 12; baseAgility = 5; baseIntelligence = 2; baseConstitution = 8;
+                Strength = 12; Agility = 5; Intelligence = 2; Constitution = 8;
                 break;
             case EClasses.Assassin:
-                baseStrength = 7; baseAgility = 12; baseIntelligence = 3; baseConstitution = 5;
+                Strength = 7; Agility = 12; Intelligence = 3; Constitution = 5;
                 break;
             case EClasses.Mage:
-                baseStrength = 3; baseAgility = 4; baseIntelligence = 14; baseConstitution = 4;
+                Strength = 3; Agility = 4; Intelligence = 14; Constitution = 4;
                 break;
             case EClasses.Builder:
-                baseStrength = 4; baseAgility = 4; baseIntelligence = 4; baseConstitution = 4;
+                Strength = 4; Agility = 4; Intelligence = 4; Constitution = 4;
                 break;
         }
 
@@ -118,21 +121,21 @@ public class PlayerStatSystem : BaseStatSystem
             switch (statUpgrade.upgradeType)
             {
                 case EUpgradeType.strength:
-                    baseStrength += statUpgrade.upgradeValue;
+                    Strength += statUpgrade.upgradeValue;
                     break;
                 case EUpgradeType.agility:
-                    baseAgility += statUpgrade.upgradeValue;
+                    Agility += statUpgrade.upgradeValue;
                     break;
                 case EUpgradeType.intelligence:
-                    baseIntelligence += statUpgrade.upgradeValue;
+                    Intelligence += statUpgrade.upgradeValue;
                     UpdateMaxEnergy();
                     break;
                 case EUpgradeType.constitution:
-                    baseConstitution += statUpgrade.upgradeValue;
+                    Constitution += statUpgrade.upgradeValue;
                     UpdateMaxHealth();
                     break;
                 case EUpgradeType.speed:
-                    speedModifier += statUpgrade.upgradeValue;
+                    SpeedModifier += statUpgrade.upgradeValue;
                     break;
                 case EUpgradeType.jumpHeight:
                     jumpModifier += statUpgrade.upgradeValue;
@@ -145,8 +148,8 @@ public class PlayerStatSystem : BaseStatSystem
     {
         CurrentHealth = MaxHealth;
         CurrentEnergy = MaxEnergy;
-        level = 1;
-        currentXp = 0;
+        Level = 1;
+        XP = 0;
         requiredXp = CalculateRequiredXp(1);
     }
 }

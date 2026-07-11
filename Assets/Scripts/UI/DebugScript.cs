@@ -4,25 +4,22 @@ using UnityEngine.InputSystem;
 
 public class DebugScript : MonoBehaviour
 {
-    private GameObject playerRef;
     private PlayerController controller;
-    private BaseStatSystem stats;
+    private PlayerStatSystem stats;
     public TMP_Text debugTextElement;
-    private InputAction debugKey;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        playerRef = GameObject.FindGameObjectWithTag("Player");
-        controller = playerRef.GetComponent<PlayerController>();
-        stats = playerRef.GetComponent<BaseStatSystem>();
-        debugKey = InputSystem.actions.FindAction("Attack");
+        controller = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        stats = controller.gameObject.GetComponent<PlayerStatSystem>();
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*debugTextElement.text = $"Player: class={controller.GetClass()}, strength={stats.GetStrength()}, agility={stats.GetAgility()}, " 
-            + $"intelligence={stats.GetIntelligence()}, constitution={stats.GetConstitution()}, level={stats.GetLevel()}, money={controller.GetMoney()}";*/
+        debugTextElement.text = $"Player: class={controller.Combat.GetClass()}, strength={stats.Strength}, agility={stats.Agility}, " 
+            + $"intelligence={stats.Intelligence}, constitution={stats.Constitution}, level={stats.Level}, money={controller.Resource.Money}, "
+            + $"\nCurrent Health={stats.CurrentHealth}";
     }
 }

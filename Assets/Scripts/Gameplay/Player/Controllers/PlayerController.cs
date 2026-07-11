@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public PlayerBuildingController Building { get; private set; }
     public PlayerLifecycleController Lifecycle { get; private set; }
     public PlayerResourceController Resource { get; private set; }
+    public PlayerAnimationController Animator { get; private set; }
     public HUDScript HUD { get; private set; }
 
     private void Awake()
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
         Building = GetComponent<PlayerBuildingController>();
         Lifecycle = GetComponent<PlayerLifecycleController>();
         Resource = GetComponent<PlayerResourceController>();
+        Animator = GetComponent<PlayerAnimationController>();
         HUD = gameObject.transform.GetComponentInChildren<HUDScript>();
     }
 
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour
     {
         InputHandler.Initialize();
         Lifecycle.Initialize();
+        GetComponent<PlayerStatSystem>().InitializeStats();
     }
 
     private void Update()

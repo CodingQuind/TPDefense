@@ -16,7 +16,7 @@ public class HUDScript : MonoBehaviour
     private PlayerController controller;
     private GameObject overlay;
     private GameObject deathPanel, pausePanel;
-    private float currentHealth, maxHealth;
+    private float currentHealth = 0f, maxHealth;
     private TMP_Text alertText;
     private GameObject buildButton;
 
@@ -41,7 +41,8 @@ public class HUDScript : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Refresh();
+        maxHealth = controller.Combat.GetMaxHealth();
+        currentHealth = controller.Combat.GetHealth();
     }
 
     public void StartHud()
@@ -91,12 +92,6 @@ public class HUDScript : MonoBehaviour
         }
 
         attackbarFill.fillAmount = 1;
-    }
-
-    public void Refresh()
-    {
-        maxHealth = controller.Combat.GetHealth();
-        currentHealth = controller.Combat.GetHealth();
     }
 
     public void ToggleBuildMenu(bool state)

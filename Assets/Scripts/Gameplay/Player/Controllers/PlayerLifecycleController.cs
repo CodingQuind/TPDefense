@@ -63,6 +63,5 @@ public class PlayerLifecycleController : MonoBehaviour
         transform.position = respawnPoint.position;
         transform.rotation = respawnPoint.rotation;
         stats.Respawn();
-        hud.Refresh();
     }
 }

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class Gamemode : MonoBehaviour
 {
-    public GameObject playerObject;
     private float resourceRegenTimer, regenInterval = 1f;
     private PlayerController controller;
     [SerializeField] private GameObject[] spawners;
@@ -16,18 +15,18 @@ public class Gamemode : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        DisablePlayer();
     }
 
     void Awake()
     {
-        controller = playerObject.GetComponent<PlayerController>();
+        controller = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         resourceRegenTimer = 0f;
         started = false;
         playerCamera = controller.gameObject.GetComponentInChildren<Camera>();
         menuCamera = GameObject.FindGameObjectWithTag("Menu Camera").GetComponent<Camera>();
         playerCamera.enabled = false;
         menuCamera.enabled = true;
-        DisablePlayer();
     }
 
     // Update is called once per frame
@@ -86,7 +85,7 @@ public class Gamemode : MonoBehaviour
         SwapCamera();
     }
 
-    private void SwapCamera()
+    public void SwapCamera()
     {
         playerCamera.enabled = !playerCamera.enabled;
         menuCamera.enabled = !menuCamera.enabled;

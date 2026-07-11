@@ -52,12 +52,16 @@ public class MainMenu : MonoBehaviour
         playerRef.HUD.HideOverlay();
         storePage.SetActive(true);
         gmControls.DisablePlayer();
+        gmControls.SwapCamera();
+        Time.timeScale = 0f;
     }
 
     public void CloseStore()
     {
+        Time.timeScale = 1f;
         playerRef.HUD.ShowOverlay();
         storePage.SetActive(false);
+        gmControls.SwapCamera();
         gmControls.EnablePlayer();
     }
 
@@ -71,6 +75,7 @@ public class MainMenu : MonoBehaviour
 
     public void Restart()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(0);
     }
 }

@@ -1,9 +1,10 @@
 using UnityEngine;
 
-public class PlayerCombatController : MonoBehaviour
+public class PlayerCombatController : MonoBehaviour, IDamageableInterface
 {
     private PlayerInputHandler input;
     private PlayerStatSystem stats;
+    private PlayerAnimationController animator;
     private HUDScript hud;
     private Camera cam;
 
@@ -14,6 +15,7 @@ public class PlayerCombatController : MonoBehaviour
     {
         input = GetComponent<PlayerInputHandler>();
         stats = GetComponent<PlayerStatSystem>();
+        animator = GetComponent<PlayerAnimationController>();
         hud = GetComponentInChildren<HUDScript>();
         cam = GetComponentInChildren<Camera>();
     }
@@ -41,6 +43,7 @@ public class PlayerCombatController : MonoBehaviour
 
         attackTimer = 0f;
         StartCoroutine(hud.AnimateAttackbar(CharacterSettings.attackSpeed));
+        animator.PlayAttackAnimation("axe"); // <--- will need to be replaced with active weapon
 
         Ray ray = new(cam.transform.position, cam.transform.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, CharacterSettings.attackRange))
@@ -55,6 +58,19 @@ public class PlayerCombatController : MonoBehaviour
         return stats.GetPhysicalDamage();
     }
 
+    public void TakeDamage(GameObject source, float amount, EDamageType type)
+    {
+        stats.Damage(amount);
+        regenTimer = 0f;
+    }
+
+    public void Heal(float amount)
+    {
+        stats.Heal(amount);
+    }
+
+    public void DamageTarget(GameObject target, float damage, EDamageType damageType) { }
+
     public EClasses GetClass()
     {
         return stats.Class;
@@ -66,4 +82,5 @@ public class PlayerCombatController : MonoBehaviour
     }
 
     public float GetHealth() { return stats.CurrentHealth; }
+    public float GetMaxHealth() { return stats.MaxHealth; }
 }

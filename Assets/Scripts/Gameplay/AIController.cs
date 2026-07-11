@@ -13,6 +13,7 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
     protected BaseStatSystem stats;
     protected NavMeshAgent navAgent;
     protected float moveSpeed = AISettings.speed;
+    [SerializeField] protected HealthBar healthbar;
 
     protected GameObject currentTarget;
     protected float attackTimer;
@@ -40,6 +41,7 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
 
         Think();
         Act();
+        healthbar.SetHealth(stats.CurrentHealth, stats.MaxHealth);
     }
 
     /// <summary>
@@ -61,6 +63,7 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
         {
             KillSelf();
         }
+        healthbar.UpdateHealth(stats.CurrentHealth, stats.MaxHealth);
     }
 
     public virtual void DamageTarget(GameObject target, float damage, EDamageType damageType)
@@ -85,7 +88,7 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
         navAgent.enabled = false;
         state = AIState.Dying;
         gameObject.tag = "Untagged";
-
+        GetComponent<Collider>().enabled = false;
         Destroy(gameObject, 3f);
     }
 

@@ -42,5 +42,19 @@ public class PlayerInputHandler : MonoBehaviour
         BuildPressed = build.WasPressedThisFrame();
         BackPressed = back.WasPressedThisFrame();
         ScrollInput = scroll.ReadValue<float>();
+
+        if (InteractPressed)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            if (Physics.Raycast(ray, out RaycastHit hit, 5f))
+            {
+                IInteractInterface interactable = hit.collider.GetComponent<IInteractInterface>();
+                if (interactable != null)
+                {
+                    interactable.Interact(gameObject);
+                }
+            }
+        }
     }
+
 }
