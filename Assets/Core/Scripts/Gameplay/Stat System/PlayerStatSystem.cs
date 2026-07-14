@@ -10,8 +10,8 @@ public class PlayerStatSystem : BaseStatSystem
     [Header("Player Attributes")]
     [SerializeField] private PlayerController playerController;
 
-    public  int Level { get; private set; } = StatSystemSettings.defaultLevel;
-    public int XP { get; private set; } = StatSystemSettings.defaultXp;
+    public  int Level { get; private set; }
+    public int XP { get; private set; }
     private int requiredXp;
 
     public int Strength { get; private set; } = 5;
@@ -27,8 +27,10 @@ public class PlayerStatSystem : BaseStatSystem
 
     public override void InitializeStats()
     {
-        MaxHealth = StatSystemSettings.defaultHealth;
-        MaxEnergy = StatSystemSettings.defaultEnergy;
+        MaxHealth = GameSettings.Instance.StatSystemSettings.defaultHealth;
+        MaxEnergy = GameSettings.Instance.StatSystemSettings.defaultEnergy;
+        Level = GameSettings.Instance.StatSystemSettings.defaultLevel;
+        XP = GameSettings.Instance.StatSystemSettings.defaultXp;
 
         base.InitializeStats();
 

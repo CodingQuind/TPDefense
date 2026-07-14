@@ -4,7 +4,7 @@ using UnityEngine;
 public class ResourceSystem : MonoBehaviour
 {
     public int startingMoney = 50;
-    private int money, moneyRegenRate = GameSettings.moneyRegenAmt;
+    private int money, moneyRegenRate = GameSettings.Instance.moneyRegenAmt;
     public void Start() { money = startingMoney; }
     public void AddMoney(int amt) { money += amt; }
     public bool RemoveMoney(int amt) { return __RemoveMoney(amt); }

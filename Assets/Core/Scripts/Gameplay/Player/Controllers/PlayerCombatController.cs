@@ -30,8 +30,8 @@ public class PlayerCombatController : MonoBehaviour, IDamageableInterface
 
     private void HandleRegen()
     {
-        if (regenTimer >= StatSystemSettings.regenerationDelay)
-            Stats.Heal(StatSystemSettings.regenerationRate * Time.deltaTime);
+        if (regenTimer >= GameSettings.Instance.StatSystemSettings.regenerationDelay)
+            Stats.Heal(GameSettings.Instance.StatSystemSettings.regenerationRate * Time.deltaTime);
         else
             regenTimer += Time.deltaTime;
     }
@@ -40,15 +40,15 @@ public class PlayerCombatController : MonoBehaviour, IDamageableInterface
     {
         attackTimer += Time.deltaTime;
 
-        if (!input.AttackPressed || attackTimer < CharacterSettings.attackSpeed)
+        if (!input.AttackPressed || attackTimer < GameSettings.Instance.CharacterSettings.attackSpeed)
             return;
 
         attackTimer = 0f;
-        StartCoroutine(hud.AnimateAttackbar(CharacterSettings.attackSpeed));
+        StartCoroutine(hud.AnimateAttackbar(GameSettings.Instance.CharacterSettings.attackSpeed));
         animator.PlayAttackAnimation("axe"); // <--- will need to be replaced with active weapon
 
         Ray ray = new(cam.transform.position, cam.transform.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, CharacterSettings.attackRange))
+        if (Physics.Raycast(ray, out RaycastHit hit, GameSettings.Instance.CharacterSettings.attackRange))
         {
             if (hit.transform.TryGetComponent<IDamageableInterface>(out var dmg))
                 dmg.TakeDamage(gameObject, Stats.GetPhysicalDamage(), EDamageType.physical);

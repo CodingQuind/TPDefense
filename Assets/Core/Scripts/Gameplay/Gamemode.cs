@@ -38,7 +38,7 @@ public class Gamemode : MonoBehaviour
             if (resourceRegenTimer >= regenInterval)
             {
                 resourceRegenTimer = 0;
-                controller.Resource.AddMoney(GameSettings.moneyRegenAmt);
+                controller.Resource.AddMoney(GameSettings.Instance.moneyRegenAmt);
             }
             if (enemyTimer >= waveTimer)
             {

@@ -12,7 +12,7 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
     [SerializeField] protected Animator animSystem;
     protected BaseStatSystem stats;
     protected NavMeshAgent navAgent;
-    protected float moveSpeed = AISettings.speed;
+    protected float moveSpeed;
     [SerializeField] protected HealthBar healthbar;
 
     protected GameObject currentTarget;
@@ -23,12 +23,15 @@ public abstract class AIController : MonoBehaviour, IDamageableInterface
     public AIState state = AIState.Patrol;
 
     [Header("Ranges")]
-    public float detectionRange = AISettings.detectionRange;
-    public float attackRange = AISettings.attackRange;
+    public float detectionRange;
+    public float attackRange;
 
     protected virtual void Start()
     {
         stats = GetComponent<BaseStatSystem>();
+        attackRange = GameSettings.Instance.AISettings.attackRange;
+        detectionRange = GameSettings.Instance.AISettings.detectionRange;
+        moveSpeed = GameSettings.Instance.AISettings.speed;
         navAgent = GetComponent<NavMeshAgent>();
 
         stats.InitializeStats();

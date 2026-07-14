@@ -42,7 +42,7 @@ public class PlayerMovementController : MonoBehaviour
         Vector3 move = transform.right * input.MoveInput.x + transform.forward * input.MoveInput.y;
         smoothedMove = Vector3.Lerp(smoothedMove, move, Time.deltaTime * 5f);
 
-        float targetSpeed = input.SprintHeld ? CharacterSettings.characterSprintSpeed : CharacterSettings.characterSpeed;
+        float targetSpeed = input.SprintHeld ? GameSettings.Instance.CharacterSettings.characterSprintSpeed : GameSettings.Instance.CharacterSettings.characterSpeed;
         moveSpeed = Mathf.Lerp(moveSpeed, targetSpeed, Time.deltaTime * 5f);
     }
 

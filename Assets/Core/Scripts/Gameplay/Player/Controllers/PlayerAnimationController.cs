@@ -30,7 +30,7 @@ public class PlayerAnimationController : MonoBehaviour
     {
         float elapsedTime = 0f;
         Quaternion origRotation = weaponRoot.transform.localRotation;
-        while (elapsedTime < CharacterSettings.attackSpeed)
+        while (elapsedTime < GameSettings.Instance.CharacterSettings.attackSpeed)
         {
             weaponRoot.transform.localRotation = Quaternion.Euler(Mathf.Sin(elapsedTime * Mathf.PI * 2) * 30, 0, 0); // Placeholder rotation animation
             elapsedTime += Time.deltaTime;

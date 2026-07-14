@@ -11,7 +11,7 @@ public class EnemyStatSystem : BaseStatSystem
 
     public override void InitializeStats()
     {
-        MaxHealth = StatSystemSettings.defaultEnemyHealth;
+        MaxHealth = GameSettings.Instance.StatSystemSettings.defaultEnemyHealth;
         MaxEnergy = 0; // enemies don't use energy
 
         base.InitializeStats();

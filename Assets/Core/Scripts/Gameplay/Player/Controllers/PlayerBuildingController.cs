@@ -24,7 +24,7 @@ public class PlayerBuildingController : MonoBehaviour
         hud = GetComponentInChildren<HUDScript>();
         cam = GetComponentInChildren<Camera>();
         foreach (BuildingData data in startingBuildings) AddBuilding(data);
-        BuildRange = BuildSystemSettings.buildRange;
+        BuildRange = GameSettings.Instance.BuildSystemSettings.buildRange;
     }
 
     public void Tick()

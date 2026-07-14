@@ -2284,6 +2284,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5647534702023691146, guid: 3b6d77fa4ef592847a173e601578bd91, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 1407130503}
+    - targetCorrespondingSourceObject: {fileID: 5647534702023691146, guid: 3b6d77fa4ef592847a173e601578bd91, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1407130500}
   m_SourcePrefab: {fileID: 100100000, guid: 3b6d77fa4ef592847a173e601578bd91, type: 3}
@@ -4751,6 +4754,55 @@ MonoBehaviour:
   mainMenuCamera: {fileID: 1369878819}
   syncPositionOnMenuOpen: 1
   overlayWorldBehindMenu: 1
+--- !u!114 &1407130503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407130497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1624fe9b38cef2444806dd00a30c7322, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameSettings
+  gameLength: 500
+  moneyRegenAmt: 10
+  CharacterSettings:
+    characterName: name
+    characterSpeed: 8
+    characterSprintSpeed: 15
+    interactRange: 5
+    characterClass: 0
+    attackSpeed: 0.5
+    attackRange: 3
+    attackDamage: 15
+  BuildSystemSettings:
+    buildRange: 15
+  StatSystemSettings:
+    defaultHealth: 500
+    defaultEnergy: 100
+    defaultLevel: 1
+    defaultXp: 0
+    regenerationRate: 25
+    regenerationDelay: 3
+    defaultEnemyHealth: 100
+    defaultEnemyEnergy: 100
+  EnemySettings:
+    defaultHealth: 100
+    defaultEnergy: 100
+    defaultLevel: 1
+    defaultXp: 0
+    defaultAttackRange: 2
+    defaultAttackDamage: 5
+    defaultSpeed: 3
+    defaultSpeedModifier: 1
+  AISettings:
+    detectionRange: 10
+    attackRange: 2
+    attackDamage: 5
+    speed: 3
+    speedModifier: 1
 --- !u!1 &1419826719
 GameObject:
   m_ObjectHideFlags: 0
@@ -6938,10 +6990,10 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 439663280}
   - {fileID: 2134664101}
   - {fileID: 351607378}
   - {fileID: 332610701}
-  - {fileID: 439663280}
   - {fileID: 463422092}
   - {fileID: 294090380}
   - {fileID: 1750306920}
