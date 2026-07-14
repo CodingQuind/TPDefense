@@ -10,15 +10,17 @@ public class MainMenu : MonoBehaviour
     public GameObject debugPanel;
     public GameObject helpPage;
     public GameObject gameOverPage;
+    public GameObject pauseMenu;
 
     private Gamemode gmControls;
-    private InputAction debugKey;
+    private InputAction debugKey, backKey;
     private PlayerController playerRef;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         gmControls = gamemodeObject.GetComponent<Gamemode>();
         debugKey = InputSystem.actions.FindAction("Open Debug");
+        backKey = InputSystem.actions.FindAction("Back");
         playerRef = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
     }
 
@@ -28,6 +30,21 @@ public class MainMenu : MonoBehaviour
         if (debugKey.triggered)
         {
             debugPanel.SetActive(!debugPanel.activeSelf);
+        }
+
+        if (backKey.triggered)
+        {
+            pauseMenu.SetActive(!pauseMenu.activeSelf);
+            if (pauseMenu.activeSelf)
+            {
+                gmControls.DisablePlayer();
+                playerRef.HUD.HideOverlay();
+            }
+            else
+            {
+                gmControls.EnablePlayer();
+                playerRef.HUD.ShowOverlay();
+            }
         }
     }
 
@@ -77,5 +94,12 @@ public class MainMenu : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(0);
+    }
+
+    public void Resume()
+    {
+        pauseMenu.SetActive(false);
+        gmControls.EnablePlayer();
+        playerRef.HUD.ShowOverlay();
     }
 }

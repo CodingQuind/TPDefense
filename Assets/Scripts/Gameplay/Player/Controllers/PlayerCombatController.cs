@@ -3,7 +3,8 @@ using UnityEngine;
 public class PlayerCombatController : MonoBehaviour, IDamageableInterface
 {
     private PlayerInputHandler input;
-    private PlayerStatSystem stats;
+    public PlayerStatSystem Stats { get; private set; }
+    private PlayerLifecycleController lifeControls;
     private PlayerAnimationController animator;
     private HUDScript hud;
     private Camera cam;
@@ -14,7 +15,8 @@ public class PlayerCombatController : MonoBehaviour, IDamageableInterface
     private void Awake()
     {
         input = GetComponent<PlayerInputHandler>();
-        stats = GetComponent<PlayerStatSystem>();
+        Stats = GetComponent<PlayerStatSystem>();
+        lifeControls = GetComponent<PlayerLifecycleController>();
         animator = GetComponent<PlayerAnimationController>();
         hud = GetComponentInChildren<HUDScript>();
         cam = GetComponentInChildren<Camera>();
@@ -29,7 +31,7 @@ public class PlayerCombatController : MonoBehaviour, IDamageableInterface
     private void HandleRegen()
     {
         if (regenTimer >= StatSystemSettings.regenerationDelay)
-            stats.Heal(StatSystemSettings.regenerationRate * Time.deltaTime);
+            Stats.Heal(StatSystemSettings.regenerationRate * Time.deltaTime);
         else
             regenTimer += Time.deltaTime;
     }
@@ -49,38 +51,45 @@ public class PlayerCombatController : MonoBehaviour, IDamageableInterface
         if (Physics.Raycast(ray, out RaycastHit hit, CharacterSettings.attackRange))
         {
             if (hit.transform.TryGetComponent<IDamageableInterface>(out var dmg))
-                dmg.TakeDamage(gameObject, stats.GetPhysicalDamage(), EDamageType.physical);
+                dmg.TakeDamage(gameObject, Stats.GetPhysicalDamage(), EDamageType.physical);
         }
     }
 
     public float GetDamage()
     {
-        return stats.GetPhysicalDamage();
+        return Stats.GetPhysicalDamage();
     }
 
     public void TakeDamage(GameObject source, float amount, EDamageType type)
     {
-        stats.Damage(amount);
-        regenTimer = 0f;
+        bool didDie = Stats.Damage(amount);
+        if (didDie) 
+        {   
+            lifeControls.Die();
+        }
+        else
+        {
+            regenTimer = 0f;
+        }
     }
 
     public void Heal(float amount)
     {
-        stats.Heal(amount);
+        Stats.Heal(amount);
     }
 
     public void DamageTarget(GameObject target, float damage, EDamageType damageType) { }
 
     public EClasses GetClass()
     {
-        return stats.Class;
+        return Stats.Class;
     }
 
     public void AddUpgrade(UpgradeObject upgrade)
     {
-        stats.AddUpgrade(upgrade);
+        Stats.AddUpgrade(upgrade);
     }
 
-    public float GetHealth() { return stats.CurrentHealth; }
-    public float GetMaxHealth() { return stats.MaxHealth; }
+    public float GetHealth() { return Stats.CurrentHealth; }
+    public float GetMaxHealth() { return Stats.MaxHealth; }
 }

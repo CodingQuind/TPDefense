@@ -1314,6 +1314,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3439902390015125112, guid: bfff4e9171b031e4ab1d02fdd65b601d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3561791825976391760, guid: bfff4e9171b031e4ab1d02fdd65b601d, type: 3}
       propertyPath: m_SizeDelta.x
       value: -200
@@ -1679,6 +1683,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 294090381}
     - target: {fileID: 6700026156181376577, guid: bfff4e9171b031e4ab1d02fdd65b601d, type: 3}
+      propertyPath: pauseMenu
+      value: 
+      objectReference: {fileID: 1100301828}
+    - target: {fileID: 6700026156181376577, guid: bfff4e9171b031e4ab1d02fdd65b601d, type: 3}
       propertyPath: debugPanel
       value: 
       objectReference: {fileID: 1247234983}
@@ -1948,6 +1956,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 281244131132471030, guid: 6a94b869d9c82f4488405a735d1c72a1, type: 3}
+      propertyPath: m_Name
+      value: EnemyTargetTag
+      objectReference: {fileID: 0}
     - target: {fileID: 2310274176806590852, guid: 6a94b869d9c82f4488405a735d1c72a1, type: 3}
       propertyPath: field of view
       value: 60
@@ -5507,9 +5519,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1875029585}
-        m_TargetAssemblyTypeName: HUDScript, Assembly-CSharp
-        m_MethodName: HidePauseMenu
+      - m_Target: {fileID: 2141613443}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6369,7 +6381,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0.47484267, g: 0.75769556, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: 300, y: 150, z: 300, w: 150}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -6405,7 +6417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingUpgradeScript
   buildingUTable: {fileID: 11400000, guid: ec90c715cfdaaa642bef55e7fbec532c, type: 2}
-  upgradePanelPrefab: {fileID: 6779061712459068935, guid: e9d230978d4fa46469ea6810188b718e, type: 3}
+  upgradePanelPrefab: {fileID: 2695666020092404288, guid: 511a059612a0d2749b8ba10322ac8ca7, type: 3}
 --- !u!1001 &2051412074
 PrefabInstance:
   m_ObjectHideFlags: 0

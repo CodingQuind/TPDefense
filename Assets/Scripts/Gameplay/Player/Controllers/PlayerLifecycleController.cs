@@ -3,22 +3,26 @@ using System.Collections;
 
 public class PlayerLifecycleController : MonoBehaviour
 {
-    private PlayerStatSystem stats;
+    private PlayerController controller;
     private HUDScript hud;
     private Transform respawnPoint;
+    private GameObject targetTag;
 
     public void Initialize()
     {
-        stats = GetComponent<PlayerStatSystem>();
+        controller = GetComponent<PlayerController>();
         hud = GetComponentInChildren<HUDScript>();
         respawnPoint = GameObject.FindGameObjectWithTag("Respawn").transform;
+        targetTag = transform.Find("EnemyTargetTag").gameObject;
     }
 
     public void Tick() { }
 
-    public void KillPlayer()
+    public void Die()
     {
+        targetTag.SetActive(false);
         hud.ShowDeathPanel(4f);
+        controller.InputHandler.enabled = false;
         StartCoroutine(RespawnRoutine());
     }
 
@@ -60,8 +64,10 @@ public class PlayerLifecycleController : MonoBehaviour
 
     private void Respawn()
     {
+        controller.InputHandler.enabled = true;
+        targetTag.SetActive(true);
         transform.position = respawnPoint.position;
         transform.rotation = respawnPoint.rotation;
-        stats.Respawn();
+        controller.Combat.Stats.Respawn();
     }
 }
